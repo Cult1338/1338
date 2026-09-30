@@ -5,13 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#04070d">
   <title>Cult1338 — Игры</title>
-  
+
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap');
+
+    /* ============================================================
+       ТЕМА: значения по умолчанию (тёмная)
+       ============================================================ */
+    :root {
+      --bg-primary:     #04070d;
+      --bg-secondary:   #060e1a;
+      --bg-card:        rgba(6, 14, 26, 0.75);
+      --border-color:   rgba(120, 200, 255, 0.15);
+      --border-strong:  rgba(120, 200, 255, 0.35);
+      --text-primary:   #eaf4ff;
+      --text-secondary: #8ba8c5;
+      --text-muted:     #5a7a96;
+      --accent:         #7fd4ff;
+      --accent-glow:    rgba(120, 200, 255, 0.4);
+      --danger:         #ff4d6d;
+
+      /* Safe area для Telegram WebApp */
+      --tg-safe-top:    0px;
+      --tg-safe-bottom: 0px;
+      --tg-viewport-height: 100vh;
+    }
+
+    /* ============================================================
+       ТЕМА: светлая (когда Telegram в light mode)
+       ============================================================ */
+    body.theme-light {
+      --bg-primary:     #f0f4f8;
+      --bg-secondary:   #ffffff;
+      --bg-card:        rgba(255, 255, 255, 0.9);
+      --border-color:   rgba(60, 120, 180, 0.2);
+      --border-strong:  rgba(60, 120, 180, 0.45);
+      --text-primary:   #0a1a2a;
+      --text-secondary: #4a6a85;
+      --text-muted:     #7a94a8;
+      --accent:         #2a90c8;
+      --accent-glow:    rgba(60, 140, 200, 0.35);
+      --danger:         #d93a5a;
+    }
 
     * {
       margin: 0;
@@ -23,18 +62,25 @@
     html, body {
       width: 100%;
       overflow-x: hidden;
+      min-height: var(--tg-viewport-height);
     }
 
     body {
-      background-color: #04070d;
-      color: #eaf4ff;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
       font-family: 'Inter', sans-serif;
       scroll-behavior: smooth;
       position: relative;
-      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    /* ---------- ФОН: ЗАТЕМНЁННЫЙ ЛЕС + ГРАДИЕНТ (fallback) ---------- */
+    /* Safe area в Telegram */
+    body.tg-webapp {
+      padding-top: var(--tg-safe-top);
+      padding-bottom: var(--tg-safe-bottom);
+    }
+
+    /* ---------- ФОН ---------- */
     .bg-forest {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -45,15 +91,25 @@
       filter: brightness(0.22) saturate(0.5) hue-rotate(180deg);
       z-index: -2;
       pointer-events: none;
+      transition: filter 0.3s;
     }
 
-    /* Fallback градиент, если картинка не загрузилась */
+    body.theme-light .bg-forest {
+      filter: brightness(0.9) saturate(0.6) hue-rotate(180deg);
+      opacity: 0.4;
+    }
+
     .bg-forest::after {
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(180deg, #071520 0%, #04070d 100%);
       opacity: 0.7;
+    }
+
+    body.theme-light .bg-forest::after {
+      background: linear-gradient(180deg, #f0f6ff 0%, #e0eaf5 100%);
+      opacity: 0.85;
     }
 
     .bg-overlay {
@@ -64,7 +120,10 @@
       pointer-events: none;
     }
 
-    /* Canvas для снежинок */
+    body.theme-light .bg-overlay {
+      background: linear-gradient(180deg, rgba(240,246,255,0.4) 0%, rgba(220,230,245,0.7) 100%);
+    }
+
     #snowCanvas {
       position: fixed;
       top: 0; left: 0;
@@ -74,17 +133,26 @@
       pointer-events: none;
     }
 
-    /* Тонкая сетка */
+    body.theme-light #snowCanvas {
+      opacity: 0.3;
+    }
+
     body::before {
       content: '';
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: 
+      background-image:
         linear-gradient(rgba(180, 220, 255, 0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(180, 220, 255, 0.025) 1px, transparent 1px);
       background-size: 50px 50px;
       pointer-events: none;
       z-index: 1;
+    }
+
+    body.theme-light::before {
+      background-image:
+        linear-gradient(rgba(60, 120, 180, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(60, 120, 180, 0.05) 1px, transparent 1px);
     }
 
     .glow-top {
@@ -94,10 +162,11 @@
       transform: translateX(-50%);
       width: 800px;
       height: 400px;
-      background: radial-gradient(circle, rgba(120, 200, 255, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
       filter: blur(70px);
+      opacity: 0.4;
     }
 
     /* ---------- НАВИГАЦИЯ ---------- */
@@ -106,10 +175,10 @@
       top: 15px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(5, 12, 24, 0.8);
+      background: var(--bg-card);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(120, 200, 255, 0.18);
+      border: 1px solid var(--border-color);
       border-radius: 50px;
       padding: 10px 18px;
       width: 92%;
@@ -118,7 +187,16 @@
       align-items: center;
       justify-content: center;
       z-index: 100;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(120, 200, 255, 0.08);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px var(--accent-glow);
+      transition: top 0.3s;
+    }
+
+    body.tg-webapp header {
+      top: calc(15px + var(--tg-safe-top));
+    }
+
+    body.theme-light header {
+      box-shadow: 0 10px 30px rgba(60, 120, 180, 0.15);
     }
 
     .header-text {
@@ -127,11 +205,11 @@
       font-weight: 900;
       letter-spacing: 7px;
       text-transform: uppercase;
-      background: linear-gradient(135deg, #ffffff 0%, #7fd4ff 60%, #4aa8e0 100%);
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 60%, var(--accent) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 30px rgba(120, 200, 255, 0.4);
+      text-shadow: 0 0 30px var(--accent-glow);
       margin: 0;
       line-height: 1;
       white-space: nowrap;
@@ -140,7 +218,7 @@
 
     .header-text::after {
       content: '|';
-      color: #7fd4ff;
+      color: var(--accent);
       font-weight: 300;
       margin-left: 3px;
       animation: blink 1s step-end infinite;
@@ -154,7 +232,7 @@
 
     /* ---------- ГЛАВНЫЙ ЭКРАН ---------- */
     .hero {
-      min-height: 100vh;
+      min-height: var(--tg-viewport-height);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -165,6 +243,10 @@
       padding: 100px 20px 60px;
     }
 
+    body.tg-webapp .hero {
+      padding-top: calc(100px + var(--tg-safe-top));
+    }
+
     .hero h1 {
       font-size: clamp(32px, 9vw, 80px);
       font-weight: 900;
@@ -172,8 +254,12 @@
       letter-spacing: -1px;
       text-transform: uppercase;
       max-width: 900px;
-      color: #ffffff;
-      text-shadow: 0 4px 30px rgba(0,0,0,0.9), 0 0 60px rgba(120, 200, 255, 0.15);
+      color: var(--text-primary);
+      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    }
+
+    body.theme-light .hero h1 {
+      text-shadow: 0 4px 20px rgba(60, 120, 180, 0.15);
     }
 
     .hero h1 .italic-red {
@@ -181,11 +267,11 @@
       font-family: 'Playfair Display', serif;
       font-style: italic;
       font-weight: 400;
-      color: #7fd4ff;
+      color: var(--accent);
       text-transform: none;
       font-size: clamp(30px, 8vw, 70px);
       margin-top: -8px;
-      text-shadow: 0 0 40px rgba(120, 200, 255, 0.5);
+      text-shadow: 0 0 40px var(--accent-glow);
     }
 
     .hero-buttons {
@@ -197,11 +283,11 @@
     }
 
     .btn-primary {
-      background: rgba(10, 25, 45, 0.7);
+      background: var(--bg-card);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(120, 200, 255, 0.35);
-      color: #eaf4ff;
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
       padding: 16px 32px;
       border-radius: 4px;
       font-size: 12px;
@@ -218,7 +304,7 @@
 
     .btn-primary:active {
       transform: scale(0.97);
-      background: rgba(120, 200, 255, 0.2);
+      background: var(--accent-glow);
     }
 
     .arrow-down {
@@ -252,8 +338,8 @@
       align-items: center;
       gap: 18px;
       margin-bottom: 45px;
-      color: #ffffff;
-      text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+      color: var(--text-primary);
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
     .section-title::before {
@@ -261,8 +347,8 @@
       display: block;
       width: 5px;
       height: 42px;
-      background: #7fd4ff;
-      box-shadow: 0 0 20px rgba(120, 200, 255, 0.7);
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
     }
 
     .games-grid {
@@ -272,10 +358,10 @@
     }
 
     .game-card {
-      background: rgba(6, 14, 26, 0.75);
+      background: var(--bg-card);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(120, 200, 255, 0.15);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 26px 22px;
       cursor: pointer;
@@ -289,14 +375,18 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
+    body.theme-light .game-card {
+      box-shadow: 0 8px 20px rgba(60, 120, 180, 0.1);
+    }
+
     .game-card:active {
       transform: scale(0.98);
-      border-color: rgba(120, 200, 255, 0.6);
+      border-color: var(--border-strong);
     }
 
     .game-card:hover {
-      border-color: rgba(120, 200, 255, 0.6);
-      box-shadow: 0 20px 45px rgba(0,0,0,0.7), 0 0 30px rgba(120, 200, 255, 0.2);
+      border-color: var(--border-strong);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow);
     }
 
     .game-card::after {
@@ -305,13 +395,12 @@
       bottom: 22px;
       right: 22px;
       font-size: 20px;
-      color: rgba(120, 200, 255, 0.3);
+      color: var(--text-muted);
       transition: all 0.3s;
     }
 
-    .game-card:active::after,
     .game-card:hover::after {
-      color: #7fd4ff;
+      color: var(--accent);
       transform: translateX(5px);
     }
 
@@ -321,17 +410,38 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 10px;
-      color: #eaf4ff;
+      color: var(--text-primary);
     }
 
     .game-card p {
       font-size: 12px;
-      color: #8ba8c5;
+      color: var(--text-secondary);
       line-height: 1.5;
       max-width: 90%;
     }
 
-    /* ---------- МОДАЛЬНОЕ ОКНО С ИГРОЙ ---------- */
+    /* Лучший счёт на карточке */
+    .game-card .best-score {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--accent-glow);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      display: none;
+    }
+
+    .game-card .best-score.visible {
+      display: block;
+    }
+
+    /* ---------- МОДАЛКА ---------- */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -345,20 +455,33 @@
       padding: 12px;
     }
 
+    body.theme-light .modal-overlay {
+      background: rgba(220, 230, 245, 0.95);
+    }
+
+    body.tg-webapp .modal-overlay {
+      padding-top: calc(12px + var(--tg-safe-top));
+      padding-bottom: calc(12px + var(--tg-safe-bottom));
+    }
+
     .modal-overlay.active {
       display: flex;
     }
 
     .modal-content {
-      background: #060e1a;
-      border: 1px solid rgba(120, 200, 255, 0.25);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-strong);
       border-radius: 16px;
       width: 100%;
       max-width: 900px;
-      max-height: 96vh;
+      max-height: calc(var(--tg-viewport-height) - var(--tg-safe-top) - var(--tg-safe-bottom) - 24px);
       overflow-y: auto;
       position: relative;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 50px rgba(120, 200, 255, 0.1);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 50px var(--accent-glow);
+    }
+
+    body.theme-light .modal-content {
+      box-shadow: 0 30px 60px rgba(60, 120, 180, 0.25);
     }
 
     .modal-header {
@@ -366,8 +489,8 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 22px;
-      border-bottom: 1px solid rgba(120, 200, 255, 0.12);
-      background: rgba(10, 22, 40, 0.5);
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-card);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -381,18 +504,18 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      color: #eaf4ff;
+      color: var(--text-primary);
     }
 
     .modal-header h2 span:first-child {
-      color: #7fd4ff;
-      text-shadow: 0 0 15px rgba(120, 200, 255, 0.7);
+      color: var(--accent);
+      text-shadow: 0 0 15px var(--accent-glow);
     }
 
     .close-btn {
       background: transparent;
-      border: 1px solid rgba(120, 200, 255, 0.3);
-      color: #8ba8c5;
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
       width: 36px;
       height: 36px;
       border-radius: 50%;
@@ -407,9 +530,9 @@
     }
 
     .close-btn:active {
-      background: #7fd4ff;
-      border-color: #7fd4ff;
-      color: #04070d;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg-primary);
     }
 
     .modal-body {
@@ -417,7 +540,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #04070d;
+      background: var(--bg-primary);
     }
 
     .game-score-bar {
@@ -430,7 +553,7 @@
     }
 
     .game-score-bar .score-label {
-      color: #6b86a3;
+      color: var(--text-muted);
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -438,10 +561,17 @@
     }
 
     .game-score-bar .score-value {
-      color: #7fd4ff;
+      color: var(--accent);
       font-size: 22px;
       font-weight: 800;
-      text-shadow: 0 0 15px rgba(120, 200, 255, 0.5);
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .game-score-bar .best-in-game {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     canvas#gameCanvas {
@@ -452,9 +582,13 @@
       height: auto;
       aspect-ratio: 2 / 1;
       background: #0a0f18;
-      border: 1px solid rgba(120, 200, 255, 0.15);
+      border: 1px solid var(--border-color);
       cursor: pointer;
       touch-action: none;
+    }
+
+    body.theme-light canvas#gameCanvas {
+      background: #dfe8f2;
     }
 
     .game-controls {
@@ -467,9 +601,9 @@
     }
 
     .ctrl-btn {
-      background: rgba(10, 22, 40, 0.8);
-      border: 1px solid rgba(120, 200, 255, 0.25);
-      color: #c8dff0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
       padding: 10px 20px;
       border-radius: 6px;
       font-size: 11px;
@@ -482,14 +616,14 @@
     }
 
     .ctrl-btn:active {
-      background: rgba(120, 200, 255, 0.2);
-      border-color: #7fd4ff;
-      color: #fff;
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--text-primary);
     }
 
     .game-hint {
       margin-top: 12px;
-      color: #5a7a96;
+      color: var(--text-muted);
       font-size: 11px;
       letter-spacing: 0.5px;
       text-align: center;
@@ -498,41 +632,20 @@
 
     /* Мобильная адаптация */
     @media (max-width: 600px) {
-      header {
-        padding: 8px 12px;
-        width: 94%;
-      }
-      .header-text {
-        font-size: 18px;
-        letter-spacing: 4px;
-      }
-      .hero {
-        padding: 90px 16px 40px;
-      }
-      .games-section {
-        padding: 60px 16px 100px;
-      }
-      .modal-body {
-        padding: 10px;
-      }
-      .modal-header {
-        padding: 12px 16px;
-      }
-      .modal-header h2 {
-        font-size: 14px;
-      }
-      .ctrl-btn {
-        padding: 8px 14px;
-        font-size: 10px;
-      }
+      header { padding: 8px 12px; width: 94%; }
+      .header-text { font-size: 18px; letter-spacing: 4px; }
+      .hero { padding: 90px 16px 40px; }
+      .games-section { padding: 60px 16px 100px; }
+      .modal-body { padding: 10px; }
+      .modal-header { padding: 12px 16px; }
+      .modal-header h2 { font-size: 14px; }
+      .ctrl-btn { padding: 8px 14px; font-size: 10px; }
     }
 
-    /* Скрытая область для отладки ошибок */
+    /* Отладочный блок */
     #errorBox {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: rgba(200, 20, 20, 0.95);
       color: #fff;
       font-family: monospace;
@@ -566,12 +679,12 @@
       <span class="italic-red">игры</span>
     </h1>
     <div class="hero-buttons">
-      <button class="btn-primary" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">
+      <button class="btn-primary" onclick="scrollToGames()">
         ИГРАТЬ В ИГРЫ
       </button>
     </div>
-    <div class="arrow-down" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7fd4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="arrow-down" onclick="scrollToGames()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
         <polyline points="6 9 12 15 18 9"></polyline>
       </svg>
     </div>
@@ -581,23 +694,27 @@
   <section class="games-section" id="games">
     <div class="section-title">ИГРЫ</div>
     <div class="games-grid">
-      
+
       <div class="game-card" data-game="snake">
+        <div class="best-score" data-best="snake">★ <span>0</span></div>
         <h3>🐍 ЗМЕЙКА</h3>
         <p>Классика. Управляй стрелками, собирай еду и не врезайся в себя.</p>
       </div>
 
       <div class="game-card" data-game="sapper">
+        <div class="best-score" data-best="sapper">★ <span>0</span></div>
         <h3>💣 САПЁР</h3>
         <p>Логическая игра. ЛКМ — открыть, ПКМ — флаг. Найди все мины.</p>
       </div>
 
       <div class="game-card" data-game="flappy">
+        <div class="best-score" data-best="flappy">★ <span>0</span></div>
         <h3>🐦 FLAPPY BIRD</h3>
         <p>Пролетай между трубами. Тап или пробел — взмах крыльев.</p>
       </div>
 
       <div class="game-card" data-game="astro">
+        <div class="best-score" data-best="astro">★ <span>0</span></div>
         <h3>🚀 КОСМО-ДОДЖ</h3>
         <p>Уклоняйся от астероидов. Стрелки влево/вправо — движение.</p>
       </div>
@@ -605,7 +722,7 @@
     </div>
   </section>
 
-  <!-- МОДАЛЬНОЕ ОКНО С ИГРОЙ -->
+  <!-- МОДАЛКА -->
   <div class="modal-overlay" id="gameModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -615,6 +732,7 @@
       <div class="modal-body">
         <div class="game-score-bar">
           <span class="score-label">Счёт</span>
+          <span class="best-in-game" id="bestInGame"></span>
           <span class="score-value" id="scoreDisplay">0</span>
         </div>
         <canvas id="gameCanvas" width="800" height="400"></canvas>
@@ -627,7 +745,6 @@
     </div>
   </div>
 
-  <!-- Отладочный блок -->
   <div id="errorBox"></div>
 
   <script>
@@ -641,17 +758,169 @@
       return false;
     };
 
-    // ========== TELEGRAM WEBAPP INIT ==========
-    try {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-      }
-    } catch(e) {}
+    // ============================================================
+    // TELEGRAM WEBAPP: инициализация, тема, кнопка «Назад», haptic
+    // ============================================================
+    var TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-    // ========== ПОЛИФИЛЛ ДЛЯ roundRect (для старых WebView) ==========
+    // Обёртки с безопасными вызовами (если TG нет — просто ничего)
+    function tgReady()          { try { TG && TG.ready(); } catch(e){} }
+    function tgExpand()         { try { TG && TG.expand(); } catch(e){} }
+    function tgDisableSwipes()  { try { TG && TG.disableVerticalSwipes && TG.disableVerticalSwipes(); } catch(e){} }
+    function tgSetHeader(color) { try { TG && TG.setHeaderColor && TG.setHeaderColor(color); } catch(e){} }
+    function tgSetBg(color)     { try { TG && TG.setBackgroundColor && TG.setBackgroundColor(color); } catch(e){} }
+    function tgShowBack(cb)     { try { TG && TG.BackButton && TG.BackButton.show() && TG.BackButton.onClick(cb); } catch(e){} }
+    function tgHideBack()       { try { TG && TG.BackButton && TG.BackButton.hide() && TG.BackButton.offClick(); } catch(e){} }
+
+    // Haptic feedback (Android; iOS игнорирует)
+    function haptic(type) {
+      try {
+        if (!TG || !TG.HapticFeedback) return;
+        if (type === 'light')      TG.HapticFeedback.impactOccurred('light');
+        else if (type === 'medium') TG.HapticFeedback.impactOccurred('medium');
+        else if (type === 'heavy')  TG.HapticFeedback.impactOccurred('heavy');
+        else if (type === 'success')TG.HapticFeedback.notificationOccurred('success');
+        else if (type === 'error')  TG.HapticFeedback.notificationOccurred('error');
+        else if (type === 'warning')TG.HapticFeedback.notificationOccurred('warning');
+        else if (type === 'select') TG.HapticFeedback.selectionChanged();
+      } catch(e) {}
+    }
+
+    // ---------- Тема: тёмная / светлая ----------
+    function applyTheme() {
+      if (!TG) return;
+      var scheme = (TG.colorScheme === 'light') ? 'light' : 'dark';
+      document.body.classList.toggle('theme-light', scheme === 'light');
+
+      var bg = scheme === 'light' ? '#f0f4f8' : '#04070d';
+      tgSetHeader(bg);
+      tgSetBg(bg);
+    }
+
+    // ---------- Viewport (safe area + высота) ----------
+    function updateViewport() {
+      if (!TG) return;
+      var root = document.documentElement;
+      var vh = (TG.viewportStableHeight || window.innerHeight) + 'px';
+      root.style.setProperty('--tg-viewport-height', vh);
+
+      var safeTop = 0, safeBottom = 0;
+      if (TG.contentSafeAreaInset) {
+        safeTop = TG.contentSafeAreaInset.top || 0;
+        safeBottom = TG.contentSafeAreaInset.bottom || 0;
+      }
+      root.style.setProperty('--tg-safe-top', safeTop + 'px');
+      root.style.setProperty('--tg-safe-bottom', safeBottom + 'px');
+    }
+
+    (function initTelegram() {
+      if (!TG) {
+        // Не в Telegram — обычный браузер. Работает как есть.
+        console.log('Not in Telegram, running in browser mode');
+        return;
+      }
+
+      tgReady();
+      tgExpand();
+      tgDisableSwipes();
+      document.body.classList.add('tg-webapp');
+      applyTheme();
+      updateViewport();
+
+      // Подписки
+      TG.onEvent('themeChanged', applyTheme);
+      TG.onEvent('viewportChanged', updateViewport);
+
+      console.log('Telegram WebApp OK | platform:', TG.platform, '| version:', TG.version);
+    })();
+
+    // ============================================================
+    // CLOUD STORAGE: сохранение лучших счётов
+    // ============================================================
+    var BestScores = {
+      cache: { snake: 0, sapper: 0, flappy: 0, astro: 0 },
+      loaded: false,
+
+      // Загрузить все рекорды из CloudStorage (или localStorage как fallback)
+      load: function(callback) {
+        var self = this;
+        if (TG && TG.CloudStorage) {
+          var keys = ['best_snake', 'best_sapper', 'best_flappy', 'best_astro'];
+          TG.CloudStorage.getItems(keys, function(err, values) {
+            if (!err && values) {
+              self.cache.snake  = parseInt(values.best_snake  || 0, 10) || 0;
+              self.cache.sapper = parseInt(values.best_sapper || 0, 10) || 0;
+              self.cache.flappy = parseInt(values.best_flappy || 0, 10) || 0;
+              self.cache.astro  = parseInt(values.best_astro  || 0, 10) || 0;
+            }
+            self.loaded = true;
+            callback && callback();
+          });
+        } else {
+          // Fallback — localStorage
+          try {
+            self.cache.snake  = parseInt(localStorage.getItem('best_snake')  || 0, 10) || 0;
+            self.cache.sapper = parseInt(localStorage.getItem('best_sapper') || 0, 10) || 0;
+            self.cache.flappy = parseInt(localStorage.getItem('best_flappy') || 0, 10) || 0;
+            self.cache.astro  = parseInt(localStorage.getItem('best_astro')  || 0, 10) || 0;
+          } catch(e) {}
+          self.loaded = true;
+          callback && callback();
+        }
+      },
+
+      // Сохранить новый рекорд, если он больше текущего
+      update: function(game, score) {
+        if (score <= (this.cache[game] || 0)) return false;
+        this.cache[game] = score;
+
+        var key = 'best_' + game;
+        if (TG && TG.CloudStorage) {
+          var obj = {}; obj[key] = String(score);
+          TG.CloudStorage.setItem(key, String(score), function(){});
+        } else {
+          try { localStorage.setItem(key, String(score)); } catch(e) {}
+        }
+        this.render();
+        return true;
+      },
+
+      // Обновить отображение на карточках
+      render: function() {
+        var self = this;
+        ['snake', 'sapper', 'flappy', 'astro'].forEach(function(g) {
+          var el = document.querySelector('[data-best="' + g + '"]');
+          if (!el) return;
+          var val = self.cache[g] || 0;
+          if (val > 0) {
+            el.classList.add('visible');
+            el.querySelector('span').textContent = val;
+          } else {
+            el.classList.remove('visible');
+          }
+        });
+      },
+    };
+
+    // Загружаем рекорды при старте
+    BestScores.load(function() {
+      BestScores.render();
+      console.log('Best scores loaded:', BestScores.cache);
+    });
+
+    // ============================================================
+    // СКРОЛЛ К ИГРАМ
+    // ============================================================
+    function scrollToGames() {
+      haptic('light');
+      document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ============================================================
+    // ПОЛИФИЛЛ roundRect
+    // ============================================================
     (function() {
-      if (typeof CanvasRenderingContext2D !== 'undefined' && 
+      if (typeof CanvasRenderingContext2D !== 'undefined' &&
           !CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
           if (typeof r === 'number') r = [r, r, r, r];
@@ -659,8 +928,7 @@
           else if (r.length === 1) r = [r[0], r[0], r[0], r[0]];
           else if (r.length === 2) r = [r[0], r[1], r[0], r[1]];
           else if (r.length === 3) r = [r[0], r[1], r[2], r[1]];
-          
-          var [tl, tr, br, bl] = r;
+          var tl = r[0], tr = r[1], br = r[2], bl = r[3];
           this.moveTo(x + tl, y);
           this.lineTo(x + w - tr, y);
           this.quadraticCurveTo(x + w, y, x + w, y + tr);
@@ -676,12 +944,13 @@
       }
     })();
 
-    // ========== АНИМАЦИЯ СНЕЖИНОК ==========
+    // ============================================================
+    // СНЕЖИНКИ
+    // ============================================================
     (function snowAnimation() {
       var canvas = document.getElementById('snowCanvas');
       var ctx = canvas.getContext('2d');
-      var width, height;
-      var snowflakes = [];
+      var width, height, snowflakes = [];
       var SNOW_COUNT = 120;
 
       function resize() {
@@ -713,25 +982,21 @@
       function draw() {
         ctx.clearRect(0, 0, width, height);
         ctx.fillStyle = '#ffffff';
-
         for (var i = 0; i < snowflakes.length; i++) {
           var flake = snowflakes[i];
           flake.wobble += flake.wobbleSpeed;
           flake.x += Math.sin(flake.wobble) * 0.5 + flake.drift;
           flake.y += flake.speed;
-
           if (flake.y > height + 10) {
             snowflakes[i] = createSnowflake();
             snowflakes[i].y = -10;
           }
           if (flake.x > width + 10) flake.x = -10;
           if (flake.x < -10) flake.x = width + 10;
-
           ctx.globalAlpha = flake.opacity;
           ctx.beginPath();
           ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
           ctx.fill();
-
           if (flake.radius > 1.8) {
             ctx.globalAlpha = flake.opacity * 0.3;
             ctx.beginPath();
@@ -745,7 +1010,9 @@
       draw();
     })();
 
-    // ========== АНИМАЦИЯ ПЕЧАТИ CULT1338 ==========
+    // ============================================================
+    // TYPEWRITER CULT1338
+    // ============================================================
     (function typewriterEffect() {
       var el = document.getElementById('typewriterHeader');
       var fullText = 'CULT1338';
@@ -757,10 +1024,7 @@
           index++;
           el.textContent = fullText.slice(0, index);
           if (index === fullText.length) {
-            setTimeout(function() {
-              isDeleting = true;
-              tick();
-            }, 10000);
+            setTimeout(function() { isDeleting = true; tick(); }, 10000);
             return;
           }
           setTimeout(tick, 180);
@@ -778,11 +1042,14 @@
       setTimeout(tick, 300);
     })();
 
-    // ========== ИГРОВОЙ ДВИЖОК ==========
+    // ============================================================
+    // ИГРОВОЙ ДВИЖОК
+    // ============================================================
     (function() {
       var canvas = document.getElementById('gameCanvas');
       var ctx = canvas.getContext('2d');
       var scoreDisplay = document.getElementById('scoreDisplay');
+      var bestInGame = document.getElementById('bestInGame');
       var modalGameTitle = document.getElementById('modalGameTitle');
       var hintText = document.getElementById('hintText');
       var modal = document.getElementById('gameModal');
@@ -794,16 +1061,16 @@
       var animationFrame = null;
       var intervalId = null;
 
-      // --- ЗМЕЙКА ---
+      // Змейка
       var snake = { body: [], dir: 'right', nextDir: 'right', food: {x:10,y:10} };
       var COLS = 40, ROWS = 20, CELL = 20;
 
-      // --- САПЁР ---
+      // Сапёр
       var sapperGrid = [], sapperRevealed = [], sapperFlags = [];
       var sapperGameOver = false, sapperWin = false;
       var SAPPER_COLS = 16, SAPPER_ROWS = 8, SAPPER_MINES = 12;
 
-      // --- FLAPPY ---
+      // Flappy
       var flappyBird = { y: 200, vy: 0, radius: 15 };
       var flappyPipes = [], flappyScore = 0, flappyGameOver = false;
       var FLAPPY_GRAVITY = 0.45;
@@ -812,7 +1079,7 @@
       var FLAPPY_PIPE_GAP = 130;
       var FLAPPY_PIPE_SPEED = 2.8;
 
-      // --- КОСМО-ДОДЖ ---
+      // Astro
       var astroPlayer = { x: 385, y: 350, width: 30, height: 30 };
       var astroObstacles = [], astroScore = 0, astroGameOver = false, astroSpawnTimer = 0;
       var ASTRO_SPEED = 5;
@@ -823,7 +1090,12 @@
 
       function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
       function updateScoreDisplay(val) { score = val; scoreDisplay.textContent = val; }
-      
+
+      function updateBestInGame() {
+        var b = BestScores.cache[currentGame] || 0;
+        bestInGame.textContent = b > 0 ? '★ Лучший: ' + b : '';
+      }
+
       function stopAllIntervals() {
         if (intervalId) { clearInterval(intervalId); intervalId = null; }
         if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
@@ -837,6 +1109,14 @@
         if (pb) pb.textContent = '⏸ Пауза';
       }
 
+      // --- Сохранение рекорда при окончании игры ---
+      function saveScoreIfGameOver(game, sc) {
+        if (sc > 0 && BestScores.update(game, sc)) {
+          haptic('success');
+          updateBestInGame();
+        }
+      }
+
       // --- ИНИЦИАЛИЗАЦИЯ ---
       function initSnake() {
         snake.body = [{x: 10, y: 10},{x: 9, y: 10},{x: 8, y: 10}];
@@ -846,60 +1126,50 @@
         gameOver = false; isPaused = false;
         hintText.textContent = 'Стрелки – управление, R – рестарт';
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+        updateBestInGame();
       }
 
       function generateSnakeFood() {
-        var freeCells = [];
-        for (var i = 0; i < COLS; i++) {
-          for (var j = 0; j < ROWS; j++) {
-            var occupied = false;
-            for (var k = 0; k < snake.body.length; k++) {
-              if (snake.body[k].x === i && snake.body[k].y === j) { occupied = true; break; }
-            }
-            if (!occupied) freeCells.push({x: i, y: j});
+        var free = [];
+        for (var i = 0; i < COLS; i++) for (var j = 0; j < ROWS; j++) {
+          var occ = false;
+          for (var k = 0; k < snake.body.length; k++) {
+            if (snake.body[k].x === i && snake.body[k].y === j) { occ = true; break; }
           }
+          if (!occ) free.push({x: i, y: j});
         }
-        if (freeCells.length === 0) return;
-        snake.food = freeCells[Math.floor(Math.random() * freeCells.length)];
+        if (free.length === 0) return;
+        snake.food = free[Math.floor(Math.random() * free.length)];
       }
 
       function initSapper() {
-        sapperGrid = [];
-        sapperRevealed = [];
-        sapperFlags = [];
+        sapperGrid = []; sapperRevealed = []; sapperFlags = [];
         for (var r = 0; r < SAPPER_ROWS; r++) {
-          sapperGrid[r] = [];
-          sapperRevealed[r] = [];
-          sapperFlags[r] = [];
+          sapperGrid[r] = []; sapperRevealed[r] = []; sapperFlags[r] = [];
           for (var c = 0; c < SAPPER_COLS; c++) {
-            sapperGrid[r][c] = 0;
-            sapperRevealed[r][c] = false;
-            sapperFlags[r][c] = false;
+            sapperGrid[r][c] = 0; sapperRevealed[r][c] = false; sapperFlags[r][c] = false;
           }
         }
         sapperGameOver = false; sapperWin = false;
-        var minesPlaced = 0;
-        while (minesPlaced < SAPPER_MINES) {
+        var placed = 0;
+        while (placed < SAPPER_MINES) {
           var r = Math.floor(Math.random() * SAPPER_ROWS);
           var c = Math.floor(Math.random() * SAPPER_COLS);
-          if (sapperGrid[r][c] !== -1) { sapperGrid[r][c] = -1; minesPlaced++; }
+          if (sapperGrid[r][c] !== -1) { sapperGrid[r][c] = -1; placed++; }
         }
-        for (var r = 0; r < SAPPER_ROWS; r++) {
-          for (var c = 0; c < SAPPER_COLS; c++) {
-            if (sapperGrid[r][c] === -1) continue;
-            var cnt = 0;
-            for (var dr = -1; dr <= 1; dr++) {
-              for (var dc = -1; dc <= 1; dc++) {
-                var nr = r + dr, nc = c + dc;
-                if (nr >= 0 && nr < SAPPER_ROWS && nc >= 0 && nc < SAPPER_COLS && sapperGrid[nr][nc] === -1) cnt++;
-              }
-            }
-            sapperGrid[r][c] = cnt;
+        for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
+          if (sapperGrid[r][c] === -1) continue;
+          var cnt = 0;
+          for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
+            var nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SAPPER_ROWS && nc >= 0 && nc < SAPPER_COLS && sapperGrid[nr][nc] === -1) cnt++;
           }
+          sapperGrid[r][c] = cnt;
         }
         updateScoreDisplay(0);
         hintText.textContent = 'Тап – открыть, долгий тап – флаг';
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+        updateBestInGame();
       }
 
       function initFlappy() {
@@ -911,6 +1181,7 @@
         for (var i = 0; i < 3; i++) {
           flappyPipes.push({ x: 700 + i * 250, top: 100 + Math.random() * 150, passed: false });
         }
+        updateBestInGame();
       }
 
       function initAstro() {
@@ -920,151 +1191,105 @@
         updateScoreDisplay(0);
         hintText.textContent = '← → – движение (или тап слева/справа)';
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+        updateBestInGame();
       }
 
-      // --- ОТРИСОВКА ---
+      // --- ОТРИСОВКА (без изменений в игровой логике, только цвета под тему) ---
+      function bgColor() { return document.body.classList.contains('theme-light') ? '#dfe8f2' : '#0a0f18'; }
+      function gridColor() { return document.body.classList.contains('theme-light') ? '#c0d0e0' : '#1e2a3a'; }
+
       function drawSnake() {
-        ctx.fillStyle = '#0a0f18'; 
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#1e2a3a'; 
-        ctx.lineWidth = 0.5;
-        for (var i = 0; i <= COLS; i++) {
-          ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke();
-        }
-        for (var i = 0; i <= ROWS; i++) {
-          ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke();
-        }
-        
-        // Еда
-        ctx.shadowColor = '#7fd4ff'; 
-        ctx.shadowBlur = 18; 
-        ctx.fillStyle = '#ff4d6d';
-        ctx.beginPath(); 
-        ctx.arc(snake.food.x * CELL + CELL/2, snake.food.y * CELL + CELL/2, CELL/2 - 2, 0, Math.PI*2); 
+        ctx.fillStyle = bgColor(); ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = gridColor(); ctx.lineWidth = 0.5;
+        for (var i = 0; i <= COLS; i++) { ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke(); }
+        for (var i = 0; i <= ROWS; i++) { ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke(); }
+
+        ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 18; ctx.fillStyle = '#ff4d6d';
+        ctx.beginPath();
+        ctx.arc(snake.food.x * CELL + CELL/2, snake.food.y * CELL + CELL/2, CELL/2 - 2, 0, Math.PI*2);
         ctx.fill();
         ctx.shadowBlur = 0;
-        
-        // Змейка
+
         for (var i = 0; i < snake.body.length; i++) {
           var seg = snake.body[i];
           var gradient = ctx.createRadialGradient(seg.x*CELL+4, seg.y*CELL+4, 2, seg.x*CELL+10, seg.y*CELL+10, 16);
-          if (i === 0) { 
-            gradient.addColorStop(0, '#b0f0ff'); 
-            gradient.addColorStop(1, '#3b82f6'); 
-          } else { 
-            gradient.addColorStop(0, '#6ea8ff'); 
-            gradient.addColorStop(1, '#1e40af'); 
-          }
+          if (i === 0) { gradient.addColorStop(0, '#b0f0ff'); gradient.addColorStop(1, '#3b82f6'); }
+          else { gradient.addColorStop(0, '#6ea8ff'); gradient.addColorStop(1, '#1e40af'); }
           ctx.fillStyle = gradient;
           ctx.shadowColor = i === 0 ? '#00ffff' : '#2563eb';
           ctx.shadowBlur = i === 0 ? 18 : 10;
           ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
         }
         ctx.shadowBlur = 0;
-        
+
         if (gameOver) {
           ctx.font = 'bold 40px "Inter", sans-serif';
-          ctx.fillStyle = '#ffffffdd';
-          ctx.shadowColor = '#ff0000';
-          ctx.shadowBlur = 20;
-          ctx.textAlign = 'center';
-          ctx.fillText('ИГРА ОКОНЧЕНА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.fillStyle = '#ffffffdd'; ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20;
+          ctx.textAlign = 'center'; ctx.fillText('ИГРА ОКОНЧЕНА', canvas.width/2, canvas.height/2);
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
         if (isPaused) {
           ctx.font = 'bold 36px "Inter", sans-serif';
-          ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff';
-          ctx.shadowBlur = 25;
-          ctx.textAlign = 'center';
-          ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.fillStyle = '#ffffffcc'; ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25;
+          ctx.textAlign = 'center'; ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
       }
 
       function drawSapper() {
-        ctx.fillStyle = '#0a0f18'; 
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        var cellW = canvas.width / SAPPER_COLS; 
-        var cellH = canvas.height / SAPPER_ROWS;
-        for (var r = 0; r < SAPPER_ROWS; r++) {
-          for (var c = 0; c < SAPPER_COLS; c++) {
-            var x = c * cellW; 
-            var y = r * cellH;
-            if (sapperRevealed[r][c]) {
-              ctx.fillStyle = '#1e2a3f'; 
-              ctx.fillRect(x, y, cellW-2, cellH-2);
-              if (sapperGrid[r][c] === -1) { 
-                ctx.font = (cellH*0.7) + 'px "Inter"'; 
-                ctx.fillStyle = '#ff4d6d'; 
-                ctx.textAlign = 'center';
-                ctx.fillText('💣', x + cellW/2, y + cellH*0.7); 
-                ctx.textAlign = 'start';
-              }
-              else if (sapperGrid[r][c] > 0) { 
-                ctx.font = 'bold ' + (cellH*0.6) + 'px "Inter"'; 
-                ctx.fillStyle = '#9ac8ff'; 
-                ctx.textAlign = 'center';
-                ctx.fillText(sapperGrid[r][c], x + cellW/2, y + cellH*0.7); 
-                ctx.textAlign = 'start';
-              }
-            } else {
-              ctx.fillStyle = sapperFlags[r][c] ? '#2a3a5a' : '#141e2c'; 
-              ctx.fillRect(x, y, cellW-2, cellH-2);
-              if (sapperFlags[r][c]) { 
-                ctx.font = (cellH*0.6) + 'px "Inter"'; 
-                ctx.fillStyle = '#7fd4ff'; 
-                ctx.textAlign = 'center';
-                ctx.fillText('⚑', x + cellW/2, y + cellH*0.7); 
-                ctx.textAlign = 'start';
-              }
+        ctx.fillStyle = bgColor(); ctx.fillRect(0, 0, canvas.width, canvas.height);
+        var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
+        for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
+          var x = c * cellW, y = r * cellH;
+          if (sapperRevealed[r][c]) {
+            ctx.fillStyle = document.body.classList.contains('theme-light') ? '#c8d8e8' : '#1e2a3f';
+            ctx.fillRect(x, y, cellW-2, cellH-2);
+            if (sapperGrid[r][c] === -1) {
+              ctx.font = (cellH*0.7) + 'px "Inter"'; ctx.fillStyle = '#ff4d6d';
+              ctx.textAlign = 'center'; ctx.fillText('💣', x + cellW/2, y + cellH*0.7); ctx.textAlign = 'start';
+            } else if (sapperGrid[r][c] > 0) {
+              ctx.font = 'bold ' + (cellH*0.6) + 'px "Inter"'; ctx.fillStyle = '#2a90c8';
+              ctx.textAlign = 'center'; ctx.fillText(sapperGrid[r][c], x + cellW/2, y + cellH*0.7); ctx.textAlign = 'start';
             }
-            ctx.strokeStyle = '#2f405a'; 
-            ctx.strokeRect(x, y, cellW-2, cellH-2);
+          } else {
+            ctx.fillStyle = sapperFlags[r][c] ? '#2a3a5a' : (document.body.classList.contains('theme-light') ? '#a8b8c8' : '#141e2c');
+            ctx.fillRect(x, y, cellW-2, cellH-2);
+            if (sapperFlags[r][c]) {
+              ctx.font = (cellH*0.6) + 'px "Inter"'; ctx.fillStyle = '#7fd4ff';
+              ctx.textAlign = 'center'; ctx.fillText('⚑', x + cellW/2, y + cellH*0.7); ctx.textAlign = 'start';
+            }
           }
+          ctx.strokeStyle = '#2f405a'; ctx.strokeRect(x, y, cellW-2, cellH-2);
         }
         if (sapperGameOver) {
-          ctx.font = 'bold 36px "Inter"';
-          ctx.fillStyle = '#ff8888';
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = 'red';
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ff8888';
+          ctx.shadowBlur = 20; ctx.shadowColor = 'red'; ctx.textAlign = 'center';
           ctx.fillText('💥 БУМ!', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         } else if (sapperWin) {
-          ctx.font = 'bold 36px "Inter"';
-          ctx.fillStyle = '#a0ffb0';
-          ctx.shadowBlur = 20;
-          ctx.shadowColor = '#00ff88';
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#a0ffb0';
+          ctx.shadowBlur = 20; ctx.shadowColor = '#00ff88'; ctx.textAlign = 'center';
           ctx.fillText('ПОБЕДА!', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
         if (isPaused) {
-          ctx.font = 'bold 36px "Inter"';
-          ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff';
-          ctx.shadowBlur = 25;
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc';
+          ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.textAlign = 'center';
           ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
       }
 
       function drawFlappy() {
         var grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grad.addColorStop(0, '#0b1424'); 
-        grad.addColorStop(1, '#1a2a3a');
-        ctx.fillStyle = grad; 
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.shadowBlur = 20; 
-        ctx.shadowColor = '#3b82f6';
+        if (document.body.classList.contains('theme-light')) {
+          grad.addColorStop(0, '#c8dcf0'); grad.addColorStop(1, '#a8c0d8');
+        } else {
+          grad.addColorStop(0, '#0b1424'); grad.addColorStop(1, '#1a2a3a');
+        }
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.shadowBlur = 20; ctx.shadowColor = '#3b82f6';
         for (var i = 0; i < flappyPipes.length; i++) {
           var pipe = flappyPipes[i];
           ctx.fillStyle = '#2d4b6e';
@@ -1075,98 +1300,54 @@
           ctx.fillRect(pipe.x + 5, pipe.top + FLAPPY_PIPE_GAP, 8, canvas.height - (pipe.top + FLAPPY_PIPE_GAP));
         }
         ctx.shadowBlur = 0;
-        
-        // Птица
-        ctx.shadowBlur = 24; 
-        ctx.shadowColor = '#fbbf24'; 
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath(); 
-        ctx.arc(150, flappyBird.y, flappyBird.radius, 0, Math.PI*2); 
-        ctx.fill();
+        ctx.shadowBlur = 24; ctx.shadowColor = '#fbbf24'; ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(150, flappyBird.y, flappyBird.radius, 0, Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0;
-        
-        ctx.fillStyle = '#000000'; 
-        ctx.beginPath(); 
-        ctx.arc(155, flappyBird.y-4, 4, 0, Math.PI*2); 
-        ctx.fill();
-        ctx.fillStyle = '#ffffff'; 
-        ctx.beginPath(); 
-        ctx.arc(156, flappyBird.y-5, 2, 0, Math.PI*2); 
-        ctx.fill();
-        
+        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(155, flappyBird.y-4, 4, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(156, flappyBird.y-5, 2, 0, Math.PI*2); ctx.fill();
+
         if (flappyGameOver) {
-          ctx.font = 'bold 40px "Inter"';
-          ctx.fillStyle = '#ffffffdd';
-          ctx.shadowColor = '#ff0000';
-          ctx.shadowBlur = 20;
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 40px "Inter"'; ctx.fillStyle = '#ffffffdd';
+          ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.textAlign = 'center';
           ctx.fillText('УПАЛ...', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
         if (isPaused) {
-          ctx.font = 'bold 36px "Inter"';
-          ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff';
-          ctx.shadowBlur = 25;
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc';
+          ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.textAlign = 'center';
           ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
       }
 
       function drawAstro() {
-        ctx.fillStyle = '#05080f'; 
+        ctx.fillStyle = document.body.classList.contains('theme-light') ? '#e8eef6' : '#05080f';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // Звёзды
         for (var i = 0; i < 60; i++) {
           ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + Math.random()*0.5) + ')';
-          ctx.beginPath(); 
-          ctx.arc((i*137)%800, (i*253)%400, 1.5, 0, Math.PI*2); 
-          ctx.fill();
+          ctx.beginPath(); ctx.arc((i*137)%800, (i*253)%400, 1.5, 0, Math.PI*2); ctx.fill();
         }
-        
-        // Игрок
-        ctx.shadowBlur = 28; 
-        ctx.shadowColor = '#00ffff'; 
-        ctx.fillStyle = '#a0e0ff';
-        ctx.beginPath(); 
-        ctx.roundRect(astroPlayer.x, astroPlayer.y, astroPlayer.width, astroPlayer.height, 8); 
-        ctx.fill();
+        ctx.shadowBlur = 28; ctx.shadowColor = '#00ffff'; ctx.fillStyle = '#a0e0ff';
+        ctx.beginPath(); ctx.roundRect(astroPlayer.x, astroPlayer.y, astroPlayer.width, astroPlayer.height, 8); ctx.fill();
         ctx.shadowBlur = 0;
-        
-        // Препятствия
-        ctx.shadowBlur = 20; 
-        ctx.shadowColor = '#ff3366';
+        ctx.shadowBlur = 20; ctx.shadowColor = '#ff3366';
         for (var i = 0; i < astroObstacles.length; i++) {
           var obs = astroObstacles[i];
-          ctx.fillStyle = '#ff4d6d'; 
-          ctx.beginPath(); 
-          ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8); 
-          ctx.fill();
+          ctx.fillStyle = '#ff4d6d';
+          ctx.beginPath(); ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8); ctx.fill();
         }
         ctx.shadowBlur = 0;
-        
         if (astroGameOver) {
-          ctx.font = 'bold 36px "Inter"';
-          ctx.fillStyle = '#ffffffdd';
-          ctx.shadowColor = '#ff0000';
-          ctx.shadowBlur = 20;
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffdd';
+          ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.textAlign = 'center';
           ctx.fillText('СТОЛКНОВЕНИЕ', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
         if (isPaused) {
-          ctx.font = 'bold 36px "Inter"';
-          ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff';
-          ctx.shadowBlur = 25;
-          ctx.textAlign = 'center';
+          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc';
+          ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.textAlign = 'center';
           ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
+          ctx.shadowBlur = 0; ctx.textAlign = 'start';
         }
       }
 
@@ -1177,29 +1358,33 @@
         else if (snake.nextDir === 'down' && snake.dir !== 'up') snake.dir = 'down';
         else if (snake.nextDir === 'left' && snake.dir !== 'right') snake.dir = 'left';
         else if (snake.nextDir === 'right' && snake.dir !== 'left') snake.dir = 'right';
-        
-        var head = snake.body[0]; 
-        var newHead = { x: head.x, y: head.y };
-        if (snake.dir === 'right') newHead.x += 1; 
-        if (snake.dir === 'left') newHead.x -= 1;
-        if (snake.dir === 'up') newHead.y -= 1; 
-        if (snake.dir === 'down') newHead.y += 1;
-        
-        if (newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS) { 
-          gameOver = true; 
-          return; 
+
+        var head = snake.body[0], newHead = { x: head.x, y: head.y };
+        if (snake.dir === 'right') newHead.x += 1;
+        if (snake.dir === 'left')  newHead.x -= 1;
+        if (snake.dir === 'up')    newHead.y -= 1;
+        if (snake.dir === 'down')  newHead.y += 1;
+
+        if (newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS) {
+          gameOver = true;
+          saveScoreIfGameOver('snake', score);
+          haptic('error');
+          return;
         }
         for (var i = 0; i < snake.body.length; i++) {
-          if (snake.body[i].x === newHead.x && snake.body[i].y === newHead.y) { 
-            gameOver = true; 
-            return; 
+          if (snake.body[i].x === newHead.x && snake.body[i].y === newHead.y) {
+            gameOver = true;
+            saveScoreIfGameOver('snake', score);
+            haptic('error');
+            return;
           }
         }
-        
+
         snake.body.unshift(newHead);
-        if (newHead.x === snake.food.x && newHead.y === snake.food.y) { 
-          updateScoreDisplay(score + 1); 
-          generateSnakeFood(); 
+        if (newHead.x === snake.food.x && newHead.y === snake.food.y) {
+          updateScoreDisplay(score + 1);
+          haptic('light');
+          generateSnakeFood();
         } else {
           snake.body.pop();
         }
@@ -1207,101 +1392,88 @@
 
       function updateFlappy() {
         if (flappyGameOver || isPaused) return;
-        flappyBird.vy += FLAPPY_GRAVITY; 
-        flappyBird.y += flappyBird.vy;
-        
-        if (flappyBird.y - flappyBird.radius < 0) { 
-          flappyBird.y = flappyBird.radius; 
-          flappyBird.vy = 0; 
+        flappyBird.vy += FLAPPY_GRAVITY; flappyBird.y += flappyBird.vy;
+
+        if (flappyBird.y - flappyBird.radius < 0) { flappyBird.y = flappyBird.radius; flappyBird.vy = 0; }
+        if (flappyBird.y + flappyBird.radius > canvas.height) {
+          flappyGameOver = true;
+          saveScoreIfGameOver('flappy', flappyScore);
+          haptic('error');
+          return;
         }
-        if (flappyBird.y + flappyBird.radius > canvas.height) { 
-          flappyGameOver = true; 
-          return; 
-        }
-        
+
         for (var i = 0; i < flappyPipes.length; i++) {
-          var pipe = flappyPipes[i]; 
-          pipe.x -= FLAPPY_PIPE_SPEED;
-          
-          if (pipe.x + FLAPPY_PIPE_WIDTH < 0) { 
-            flappyPipes.splice(i, 1); 
-            i--; 
-            continue; 
-          }
-          
+          var pipe = flappyPipes[i]; pipe.x -= FLAPPY_PIPE_SPEED;
+          if (pipe.x + FLAPPY_PIPE_WIDTH < 0) { flappyPipes.splice(i, 1); i--; continue; }
           if (150 + flappyBird.radius > pipe.x && 150 - flappyBird.radius < pipe.x + FLAPPY_PIPE_WIDTH) {
-            if (flappyBird.y - flappyBird.radius < pipe.top || 
-                flappyBird.y + flappyBird.radius > pipe.top + FLAPPY_PIPE_GAP) { 
-              flappyGameOver = true; 
-              return; 
+            if (flappyBird.y - flappyBird.radius < pipe.top ||
+                flappyBird.y + flappyBird.radius > pipe.top + FLAPPY_PIPE_GAP) {
+              flappyGameOver = true;
+              saveScoreIfGameOver('flappy', flappyScore);
+              haptic('error');
+              return;
             }
           }
-          
-          if (!pipe.passed && pipe.x + FLAPPY_PIPE_WIDTH < 150) { 
-            pipe.passed = true; 
-            flappyScore++; 
-            updateScoreDisplay(flappyScore); 
+          if (!pipe.passed && pipe.x + FLAPPY_PIPE_WIDTH < 150) {
+            pipe.passed = true; flappyScore++;
+            updateScoreDisplay(flappyScore);
+            haptic('light');
           }
         }
-        
+
         if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length-1].x < 600) {
-          flappyPipes.push({ 
-            x: 800, 
-            top: 50 + Math.random() * 200, 
-            passed: false 
-          });
+          flappyPipes.push({ x: 800, top: 50 + Math.random() * 200, passed: false });
         }
       }
 
       function updateAstro() {
         if (astroGameOver || isPaused) return;
-        
-        if (keys['ArrowLeft'] && astroPlayer.x > 10) astroPlayer.x -= ASTRO_SPEED;
+
+        if (keys['ArrowLeft']  && astroPlayer.x > 10) astroPlayer.x -= ASTRO_SPEED;
         if (keys['ArrowRight'] && astroPlayer.x < canvas.width - astroPlayer.width - 10) astroPlayer.x += ASTRO_SPEED;
-        
+
         astroSpawnTimer++;
         if (astroSpawnTimer % 30 === 0) {
-          astroObstacles.push({ 
-            x: Math.random() * (canvas.width - ASTRO_OBS_WIDTH), 
-            y: -ASTRO_OBS_HEIGHT, 
-            w: ASTRO_OBS_WIDTH, 
-            h: ASTRO_OBS_HEIGHT 
+          astroObstacles.push({
+            x: Math.random() * (canvas.width - ASTRO_OBS_WIDTH),
+            y: -ASTRO_OBS_HEIGHT,
+            w: ASTRO_OBS_WIDTH, h: ASTRO_OBS_HEIGHT,
           });
         }
-        
+
         for (var i = astroObstacles.length - 1; i >= 0; i--) {
-          var obs = astroObstacles[i]; 
-          obs.y += 3.5;
-          
-          if (obs.x < astroPlayer.x + astroPlayer.width && 
-              obs.x + obs.w > astroPlayer.x && 
-              obs.y < astroPlayer.y + astroPlayer.height && 
-              obs.y + obs.h > astroPlayer.y) { 
-            astroGameOver = true; 
-            return; 
+          var obs = astroObstacles[i]; obs.y += 3.5;
+          if (obs.x < astroPlayer.x + astroPlayer.width &&
+              obs.x + obs.w > astroPlayer.x &&
+              obs.y < astroPlayer.y + astroPlayer.height &&
+              obs.y + obs.h > astroPlayer.y) {
+            astroGameOver = true;
+            saveScoreIfGameOver('astro', astroScore);
+            haptic('error');
+            return;
           }
-          
-          if (obs.y > canvas.height) { 
-            astroObstacles.splice(i, 1); 
-            astroScore++; 
-            updateScoreDisplay(astroScore); 
+          if (obs.y > canvas.height) {
+            astroObstacles.splice(i, 1);
+            astroScore++;
+            updateScoreDisplay(astroScore);
+            haptic('light');
           }
         }
       }
 
       function updateSapper() {
         if (sapperGameOver || sapperWin || isPaused) return;
-        var revealedCount = 0; 
-        var totalSafe = SAPPER_ROWS * SAPPER_COLS - SAPPER_MINES;
-        for (var r = 0; r < SAPPER_ROWS; r++) {
-          for (var c = 0; c < SAPPER_COLS; c++) {
-            if (sapperRevealed[r][c] && sapperGrid[r][c] !== -1) revealedCount++;
-          }
+        var revealedCount = 0, totalSafe = SAPPER_ROWS * SAPPER_COLS - SAPPER_MINES;
+        for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
+          if (sapperRevealed[r][c] && sapperGrid[r][c] !== -1) revealedCount++;
         }
-        if (revealedCount === totalSafe) sapperWin = true;
+        if (revealedCount === totalSafe && !sapperWin) {
+          sapperWin = true;
+          saveScoreIfGameOver('sapper', score);
+          haptic('success');
+        }
       }
 
-      // --- ИГРОВОЙ ЦИКЛ ---
       function gameLoop() {
         clearCanvas();
         if (currentGame === 'snake') drawSnake();
@@ -1327,112 +1499,121 @@
         }, 60);
       }
 
+      // ---------- Кнопка Назад ----------
+      function handleBackButton() {
+        // Если открыта модалка — закрываем её и возвращаемся к списку игр
+        if (modal.classList.contains('active')) {
+          closeModalAndStop();
+        }
+      }
+
+      function closeModalAndStop() {
+        modal.classList.remove('active');
+        stopAllIntervals();
+        tgHideBack();
+      }
+
+      // ---------- Переключение игры ----------
       function switchGame(game) {
         stopCurrentGame();
         currentGame = game;
         var titles = { snake: 'ЗМЕЙКА', sapper: 'САПЁР', flappy: 'FLAPPY BIRD', astro: 'КОСМО-ДОДЖ' };
         modalGameTitle.textContent = titles[game];
-        
+
         if (game === 'snake') initSnake();
         else if (game === 'sapper') initSapper();
         else if (game === 'flappy') initFlappy();
         else if (game === 'astro') initAstro();
-        
+
         startRenderLoop();
         startLogicInterval();
         isPaused = false;
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+
+        // Показываем кнопку «Назад» в шапке Telegram
+        tgShowBack(handleBackButton);
       }
 
-      // --- ОБРАБОТКА КЛАВИАТУРЫ ---
+      // ---------- Клавиатура ----------
       window.addEventListener('keydown', function(e) {
         keys[e.key] = true;
-        
         if (currentGame === 'snake') {
-          if (e.key === 'ArrowUp') { e.preventDefault(); snake.nextDir = 'up'; }
-          if (e.key === 'ArrowDown') { e.preventDefault(); snake.nextDir = 'down'; }
-          if (e.key === 'ArrowLeft') { e.preventDefault(); snake.nextDir = 'left'; }
-          if (e.key === 'ArrowRight') { e.preventDefault(); snake.nextDir = 'right'; }
+          if (e.key === 'ArrowUp')    { e.preventDefault(); snake.nextDir = 'up';    haptic('select'); }
+          if (e.key === 'ArrowDown')  { e.preventDefault(); snake.nextDir = 'down';  haptic('select'); }
+          if (e.key === 'ArrowLeft')  { e.preventDefault(); snake.nextDir = 'left';  haptic('select'); }
+          if (e.key === 'ArrowRight') { e.preventDefault(); snake.nextDir = 'right'; haptic('select'); }
         }
         if (currentGame === 'flappy' && (e.key === ' ' || e.key === 'Space')) {
           e.preventDefault();
-          if (!flappyGameOver && !isPaused) flappyBird.vy = FLAPPY_JUMP;
+          if (!flappyGameOver && !isPaused) { flappyBird.vy = FLAPPY_JUMP; haptic('light'); }
         }
         if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
-          e.preventDefault(); 
+          e.preventDefault();
           restartCurrentGame();
+        }
+        if (e.key === 'Escape') {
+          closeModalAndStop();
         }
       });
 
-      window.addEventListener('keyup', function(e) { 
-        keys[e.key] = false; 
-      });
+      window.addEventListener('keyup', function(e) { keys[e.key] = false; });
 
-      // --- ОБРАБОТКА КЛИКОВ ПО CANVAS ---
+      // ---------- Клики по canvas ----------
       var longPressTimer = null;
       var isLongPress = false;
 
       canvas.addEventListener('click', function(e) {
         if (isLongPress) { isLongPress = false; return; }
-        
+
         if (currentGame === 'flappy') {
-          if (!flappyGameOver && !isPaused) flappyBird.vy = FLAPPY_JUMP;
+          if (!flappyGameOver && !isPaused) { flappyBird.vy = FLAPPY_JUMP; haptic('light'); }
         } else if (currentGame === 'sapper') {
           if (sapperGameOver || sapperWin || isPaused) return;
           var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width; 
-          var scaleY = canvas.height / rect.height;
-          var mouseX = (e.clientX - rect.left) * scaleX; 
-          var mouseY = (e.clientY - rect.top) * scaleY;
-          var cellW = canvas.width / SAPPER_COLS; 
-          var cellH = canvas.height / SAPPER_ROWS;
-          var c = Math.floor(mouseX / cellW); 
-          var r = Math.floor(mouseY / cellH);
-          
+          var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+          var mouseX = (e.clientX - rect.left) * scaleX, mouseY = (e.clientY - rect.top) * scaleY;
+          var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
+          var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
+
           if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
             if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
-            if (sapperGrid[r][c] === -1) { 
-              sapperGameOver = true; 
-              sapperRevealed[r][c] = true; 
-            } else { 
-              revealSapperCell(r, c); 
-              updateSapper(); 
+            if (sapperGrid[r][c] === -1) {
+              sapperGameOver = true;
+              sapperRevealed[r][c] = true;
+              saveScoreIfGameOver('sapper', score);
+              haptic('error');
+            } else {
+              revealSapperCell(r, c);
+              updateScoreDisplay(score + 1);
+              haptic('light');
+              updateSapper();
             }
           }
         } else if (currentGame === 'astro') {
-          // Тап слева/справа для мобильных
           var rect = canvas.getBoundingClientRect();
           var tapX = e.clientX - rect.left;
-          if (tapX < rect.width / 2) {
-            astroPlayer.x = Math.max(10, astroPlayer.x - 40);
-          } else {
-            astroPlayer.x = Math.min(canvas.width - astroPlayer.width - 10, astroPlayer.x + 40);
-          }
+          if (tapX < rect.width / 2) astroPlayer.x = Math.max(10, astroPlayer.x - 40);
+          else astroPlayer.x = Math.min(canvas.width - astroPlayer.width - 10, astroPlayer.x + 40);
+          haptic('light');
         }
       });
 
-      // Долгое нажатие для флагов в сапёре (мобильные)
       canvas.addEventListener('touchstart', function(e) {
         if (currentGame !== 'sapper') return;
         if (sapperGameOver || sapperWin || isPaused) return;
-        
         var touch = e.touches[0];
         var rect = canvas.getBoundingClientRect();
-        var scaleX = canvas.width / rect.width; 
-        var scaleY = canvas.height / rect.height;
-        var mouseX = (touch.clientX - rect.left) * scaleX; 
-        var mouseY = (touch.clientY - rect.top) * scaleY;
-        var cellW = canvas.width / SAPPER_COLS; 
-        var cellH = canvas.height / SAPPER_ROWS;
-        var c = Math.floor(mouseX / cellW); 
-        var r = Math.floor(mouseY / cellH);
-        
+        var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+        var mouseX = (touch.clientX - rect.left) * scaleX, mouseY = (touch.clientY - rect.top) * scaleY;
+        var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
+        var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
         isLongPress = false;
         longPressTimer = setTimeout(function() {
           isLongPress = true;
           if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
             if (sapperRevealed[r][c]) return;
             sapperFlags[r][c] = !sapperFlags[r][c];
+            haptic('medium');
           }
         }, 400);
       }, { passive: true });
@@ -1446,18 +1627,14 @@
         if (currentGame === 'sapper') {
           if (sapperGameOver || sapperWin || isPaused) return;
           var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width; 
-          var scaleY = canvas.height / rect.height;
-          var mouseX = (e.clientX - rect.left) * scaleX; 
-          var mouseY = (e.clientY - rect.top) * scaleY;
-          var cellW = canvas.width / SAPPER_COLS; 
-          var cellH = canvas.height / SAPPER_ROWS;
-          var c = Math.floor(mouseX / cellW); 
-          var r = Math.floor(mouseY / cellH);
-          
+          var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+          var mouseX = (e.clientX - rect.left) * scaleX, mouseY = (e.clientY - rect.top) * scaleY;
+          var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
+          var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
           if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
             if (sapperRevealed[r][c]) return;
             sapperFlags[r][c] = !sapperFlags[r][c];
+            haptic('medium');
           }
         }
       });
@@ -1465,30 +1642,32 @@
       function revealSapperCell(r, c) {
         if (r < 0 || r >= SAPPER_ROWS || c < 0 || c >= SAPPER_COLS) return;
         if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
-        if (sapperGrid[r][c] === -1) { 
-          sapperGameOver = true; 
-          sapperRevealed[r][c] = true; 
-          return; 
+        if (sapperGrid[r][c] === -1) {
+          sapperGameOver = true;
+          sapperRevealed[r][c] = true;
+          return;
         }
         sapperRevealed[r][c] = true;
         if (sapperGrid[r][c] === 0) {
-          for (var dr = -1; dr <= 1; dr++) {
-            for (var dc = -1; dc <= 1; dc++) {
-              if (dr === 0 && dc === 0) continue;
-              revealSapperCell(r + dr, c + dc);
-            }
+          for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            revealSapperCell(r + dr, c + dc);
           }
         }
       }
 
-      // --- КНОПКИ УПРАВЛЕНИЯ ---
-      document.getElementById('restartBtn').addEventListener('click', restartCurrentGame);
-      
+      // ---------- Кнопки управления ----------
+      document.getElementById('restartBtn').addEventListener('click', function() {
+        haptic('medium');
+        restartCurrentGame();
+      });
+
       document.getElementById('pauseBtn').addEventListener('click', function() {
         if (gameOver && currentGame !== 'sapper') return;
         if (currentGame === 'sapper' && (sapperGameOver || sapperWin)) return;
         isPaused = !isPaused;
         this.textContent = isPaused ? '▶ Продолжить' : '⏸ Пауза';
+        haptic('light');
       });
 
       function restartCurrentGame() {
@@ -1496,32 +1675,40 @@
         else if (currentGame === 'sapper') initSapper();
         else if (currentGame === 'flappy') initFlappy();
         else if (currentGame === 'astro') initAstro();
-        isPaused = false; 
-        gameOver = false;
+        isPaused = false; gameOver = false;
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
       }
 
-      // --- ОТКРЫТИЕ/ЗАКРЫТИЕ МОДАЛКИ ---
+      // ---------- Открытие/закрытие модалки ----------
       var cards = document.querySelectorAll('.game-card');
       for (var i = 0; i < cards.length; i++) {
         cards[i].addEventListener('click', function() {
+          haptic('medium');
           modal.classList.add('active');
           switchGame(this.getAttribute('data-game'));
         });
       }
 
       document.getElementById('closeModal').addEventListener('click', function() {
-        modal.classList.remove('active');
-        stopAllIntervals();
+        haptic('light');
+        closeModalAndStop();
       });
 
       modal.addEventListener('click', function(e) {
         if (e.target === modal) {
-          modal.classList.remove('active');
-          stopAllIntervals();
+          haptic('light');
+          closeModalAndStop();
         }
       });
 
+      // При уходе из WebApp — сохраняем текущий счёт (на случай долгой игры)
+      if (TG) {
+        try {
+          TG.onEvent('viewportChanged', function() {
+            // ничего не делаем, просто заглушка
+          });
+        } catch(e){}
+      }
     })();
   </script>
 </body>
