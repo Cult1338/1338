@@ -6,16 +6,12 @@
   <meta name="theme-color" content="#04070d">
   <title>Cult1338 — Игры</title>
 
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap');
 
-    /* ============================================================
-       ТЕМА: значения по умолчанию (тёмная)
-       ============================================================ */
     :root {
       --bg-primary:     #04070d;
       --bg-secondary:   #060e1a;
@@ -29,15 +25,11 @@
       --accent-glow:    rgba(120, 200, 255, 0.4);
       --danger:         #ff4d6d;
 
-      /* Safe area для Telegram WebApp */
       --tg-safe-top:    0px;
       --tg-safe-bottom: 0px;
       --tg-viewport-height: 100vh;
     }
 
-    /* ============================================================
-       ТЕМА: светлая (когда Telegram в light mode)
-       ============================================================ */
     body.theme-light {
       --bg-primary:     #f0f4f8;
       --bg-secondary:   #ffffff;
@@ -74,13 +66,11 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Safe area в Telegram */
     body.tg-webapp {
       padding-top: var(--tg-safe-top);
       padding-bottom: var(--tg-safe-bottom);
     }
 
-    /* ---------- ФОН ---------- */
     .bg-forest {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -133,9 +123,7 @@
       pointer-events: none;
     }
 
-    body.theme-light #snowCanvas {
-      opacity: 0.3;
-    }
+    body.theme-light #snowCanvas { opacity: 0.3; }
 
     body::before {
       content: '';
@@ -169,7 +157,6 @@
       opacity: 0.4;
     }
 
-    /* ---------- НАВИГАЦИЯ ---------- */
     header {
       position: fixed;
       top: 15px;
@@ -191,9 +178,7 @@
       transition: top 0.3s;
     }
 
-    body.tg-webapp header {
-      top: calc(15px + var(--tg-safe-top));
-    }
+    body.tg-webapp header { top: calc(15px + var(--tg-safe-top)); }
 
     body.theme-light header {
       box-shadow: 0 10px 30px rgba(60, 120, 180, 0.15);
@@ -230,7 +215,6 @@
       50% { opacity: 0; }
     }
 
-    /* ---------- ГЛАВНЫЙ ЭКРАН ---------- */
     .hero {
       min-height: var(--tg-viewport-height);
       display: flex;
@@ -320,7 +304,6 @@
       60% { transform: translateY(-5px); }
     }
 
-    /* ---------- СЕКЦИЯ ИГР ---------- */
     .games-section {
       padding: 80px 20px 120px;
       max-width: 1200px;
@@ -420,7 +403,6 @@
       max-width: 90%;
     }
 
-    /* Лучший счёт на карточке */
     .game-card .best-score {
       position: absolute;
       top: 14px;
@@ -437,11 +419,8 @@
       display: none;
     }
 
-    .game-card .best-score.visible {
-      display: block;
-    }
+    .game-card .best-score.visible { display: block; }
 
-    /* ---------- МОДАЛКА ---------- */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -464,9 +443,7 @@
       padding-bottom: calc(12px + var(--tg-safe-bottom));
     }
 
-    .modal-overlay.active {
-      display: flex;
-    }
+    .modal-overlay.active { display: flex; }
 
     .modal-content {
       background: var(--bg-secondary);
@@ -587,9 +564,7 @@
       touch-action: none;
     }
 
-    body.theme-light canvas#gameCanvas {
-      background: #dfe8f2;
-    }
+    body.theme-light canvas#gameCanvas { background: #dfe8f2; }
 
     .game-controls {
       display: flex;
@@ -630,7 +605,6 @@
       padding: 0 10px;
     }
 
-    /* Мобильная адаптация */
     @media (max-width: 600px) {
       header { padding: 8px 12px; width: 94%; }
       .header-text { font-size: 18px; letter-spacing: 4px; }
@@ -642,7 +616,6 @@
       .ctrl-btn { padding: 8px 14px; font-size: 10px; }
     }
 
-    /* Отладочный блок */
     #errorBox {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -661,18 +634,15 @@
 </head>
 <body>
 
-  <!-- ФОН -->
   <div class="bg-forest"></div>
   <div class="bg-overlay"></div>
   <canvas id="snowCanvas"></canvas>
   <div class="glow-top"></div>
 
-  <!-- НАВИГАЦИЯ -->
   <header>
     <div class="header-text" id="typewriterHeader"></div>
   </header>
 
-  <!-- ГЛАВНЫЙ ЭКРАН -->
   <section class="hero">
     <h1>
       НОВЫЙ ВЗГЛЯД НА<br>
@@ -690,7 +660,6 @@
     </div>
   </section>
 
-  <!-- СЕКЦИЯ ИГР -->
   <section class="games-section" id="games">
     <div class="section-title">ИГРЫ</div>
     <div class="games-grid">
@@ -722,7 +691,6 @@
     </div>
   </section>
 
-  <!-- МОДАЛКА -->
   <div class="modal-overlay" id="gameModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -748,7 +716,9 @@
   <div id="errorBox"></div>
 
   <script>
-    // ========== ГЛОБАЛЬНЫЙ ПЕРЕХВАТ ОШИБОК ==========
+    // ============================================================
+    // ГЛОБАЛЬНЫЙ ПЕРЕХВАТ ОШИБОК
+    // ============================================================
     window.onerror = function(msg, url, line) {
       var box = document.getElementById('errorBox');
       if (box) {
@@ -759,24 +729,22 @@
     };
 
     // ============================================================
-    // TELEGRAM WEBAPP: инициализация, тема, кнопка «Назад», haptic
+    // TELEGRAM WEBAPP
     // ============================================================
     var TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-    // Обёртки с безопасными вызовами (если TG нет — просто ничего)
     function tgReady()          { try { TG && TG.ready(); } catch(e){} }
     function tgExpand()         { try { TG && TG.expand(); } catch(e){} }
     function tgDisableSwipes()  { try { TG && TG.disableVerticalSwipes && TG.disableVerticalSwipes(); } catch(e){} }
-    function tgSetHeader(color) { try { TG && TG.setHeaderColor && TG.setHeaderColor(color); } catch(e){} }
-    function tgSetBg(color)     { try { TG && TG.setBackgroundColor && TG.setBackgroundColor(color); } catch(e){} }
+    function tgSetHeader(c)     { try { TG && TG.setHeaderColor && TG.setHeaderColor(c); } catch(e){} }
+    function tgSetBg(c)         { try { TG && TG.setBackgroundColor && TG.setBackgroundColor(c); } catch(e){} }
     function tgShowBack(cb)     { try { TG && TG.BackButton && TG.BackButton.show() && TG.BackButton.onClick(cb); } catch(e){} }
     function tgHideBack()       { try { TG && TG.BackButton && TG.BackButton.hide() && TG.BackButton.offClick(); } catch(e){} }
 
-    // Haptic feedback (Android; iOS игнорирует)
     function haptic(type) {
       try {
         if (!TG || !TG.HapticFeedback) return;
-        if (type === 'light')      TG.HapticFeedback.impactOccurred('light');
+        if (type === 'light')       TG.HapticFeedback.impactOccurred('light');
         else if (type === 'medium') TG.HapticFeedback.impactOccurred('medium');
         else if (type === 'heavy')  TG.HapticFeedback.impactOccurred('heavy');
         else if (type === 'success')TG.HapticFeedback.notificationOccurred('success');
@@ -786,24 +754,20 @@
       } catch(e) {}
     }
 
-    // ---------- Тема: тёмная / светлая ----------
     function applyTheme() {
       if (!TG) return;
       var scheme = (TG.colorScheme === 'light') ? 'light' : 'dark';
       document.body.classList.toggle('theme-light', scheme === 'light');
-
       var bg = scheme === 'light' ? '#f0f4f8' : '#04070d';
       tgSetHeader(bg);
       tgSetBg(bg);
     }
 
-    // ---------- Viewport (safe area + высота) ----------
     function updateViewport() {
       if (!TG) return;
       var root = document.documentElement;
       var vh = (TG.viewportStableHeight || window.innerHeight) + 'px';
       root.style.setProperty('--tg-viewport-height', vh);
-
       var safeTop = 0, safeBottom = 0;
       if (TG.contentSafeAreaInset) {
         safeTop = TG.contentSafeAreaInset.top || 0;
@@ -815,33 +779,27 @@
 
     (function initTelegram() {
       if (!TG) {
-        // Не в Telegram — обычный браузер. Работает как есть.
         console.log('Not in Telegram, running in browser mode');
         return;
       }
-
       tgReady();
       tgExpand();
       tgDisableSwipes();
       document.body.classList.add('tg-webapp');
       applyTheme();
       updateViewport();
-
-      // Подписки
       TG.onEvent('themeChanged', applyTheme);
       TG.onEvent('viewportChanged', updateViewport);
-
       console.log('Telegram WebApp OK | platform:', TG.platform, '| version:', TG.version);
     })();
 
     // ============================================================
-    // CLOUD STORAGE: сохранение лучших счётов
+    // BEST SCORES (CloudStorage)
     // ============================================================
     var BestScores = {
       cache: { snake: 0, sapper: 0, flappy: 0, astro: 0 },
       loaded: false,
 
-      // Загрузить все рекорды из CloudStorage (или localStorage как fallback)
       load: function(callback) {
         var self = this;
         if (TG && TG.CloudStorage) {
@@ -857,7 +815,6 @@
             callback && callback();
           });
         } else {
-          // Fallback — localStorage
           try {
             self.cache.snake  = parseInt(localStorage.getItem('best_snake')  || 0, 10) || 0;
             self.cache.sapper = parseInt(localStorage.getItem('best_sapper') || 0, 10) || 0;
@@ -869,14 +826,12 @@
         }
       },
 
-      // Сохранить новый рекорд, если он больше текущего
       update: function(game, score) {
         if (score <= (this.cache[game] || 0)) return false;
         this.cache[game] = score;
 
         var key = 'best_' + game;
         if (TG && TG.CloudStorage) {
-          var obj = {}; obj[key] = String(score);
           TG.CloudStorage.setItem(key, String(score), function(){});
         } else {
           try { localStorage.setItem(key, String(score)); } catch(e) {}
@@ -885,7 +840,6 @@
         return true;
       },
 
-      // Обновить отображение на карточках
       render: function() {
         var self = this;
         ['snake', 'sapper', 'flappy', 'astro'].forEach(function(g) {
@@ -902,23 +856,20 @@
       },
     };
 
-    // Загружаем рекорды при старте
     BestScores.load(function() {
       BestScores.render();
       console.log('Best scores loaded:', BestScores.cache);
     });
 
     // ============================================================
-    // СКРОЛЛ К ИГРАМ
+    // УТИЛИТЫ
     // ============================================================
     function scrollToGames() {
       haptic('light');
       document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ============================================================
-    // ПОЛИФИЛЛ roundRect
-    // ============================================================
+    // Полифилл roundRect
     (function() {
       if (typeof CanvasRenderingContext2D !== 'undefined' &&
           !CanvasRenderingContext2D.prototype.roundRect) {
@@ -1011,7 +962,7 @@
     })();
 
     // ============================================================
-    // TYPEWRITER CULT1338
+    // TYPEWRITER
     // ============================================================
     (function typewriterEffect() {
       var el = document.getElementById('typewriterHeader');
@@ -1043,7 +994,7 @@
     })();
 
     // ============================================================
-    // ИГРОВОЙ ДВИЖОК
+    // ИГРОВОЙ ДВИЖОК (delta-time, без ограничения FPS)
     // ============================================================
     (function() {
       var canvas = document.getElementById('gameCanvas');
@@ -1059,13 +1010,20 @@
       var isPaused = false;
       var gameOver = false;
       var animationFrame = null;
-      var intervalId = null;
 
-      // Змейка
+      // Delta-time
+      var lastFrameTime = 0;
+      var logicAccumulator = 0;
+      var LOGIC_STEP = 1 / 60;
+      var MAX_FRAME = 0.1;
+
+      // Snake
       var snake = { body: [], dir: 'right', nextDir: 'right', food: {x:10,y:10} };
       var COLS = 40, ROWS = 20, CELL = 20;
+      var SNAKE_SPEED = 8;
+      var snakeTimer = 0;
 
-      // Сапёр
+      // Sapper
       var sapperGrid = [], sapperRevealed = [], sapperFlags = [];
       var sapperGameOver = false, sapperWin = false;
       var SAPPER_COLS = 16, SAPPER_ROWS = 8, SAPPER_MINES = 12;
@@ -1073,16 +1031,19 @@
       // Flappy
       var flappyBird = { y: 200, vy: 0, radius: 15 };
       var flappyPipes = [], flappyScore = 0, flappyGameOver = false;
-      var FLAPPY_GRAVITY = 0.45;
-      var FLAPPY_JUMP = -7.5;
+      var FLAPPY_GRAVITY = 25;
+      var FLAPPY_JUMP = -8.0;
       var FLAPPY_PIPE_WIDTH = 55;
       var FLAPPY_PIPE_GAP = 130;
-      var FLAPPY_PIPE_SPEED = 2.8;
+      var FLAPPY_PIPE_SPEED = 3.0;
 
       // Astro
       var astroPlayer = { x: 385, y: 350, width: 30, height: 30 };
-      var astroObstacles = [], astroScore = 0, astroGameOver = false, astroSpawnTimer = 0;
-      var ASTRO_SPEED = 5;
+      var astroObstacles = [], astroScore = 0, astroGameOver = false;
+      var ASTRO_SPEED = 6;
+      var ASTRO_FALL = 4;
+      var ASTRO_SPAWN_EVERY = 0.5;
+      var astroSpawnTimer = 0;
       var ASTRO_OBS_WIDTH = 35;
       var ASTRO_OBS_HEIGHT = 35;
 
@@ -1097,8 +1058,9 @@
       }
 
       function stopAllIntervals() {
-        if (intervalId) { clearInterval(intervalId); intervalId = null; }
         if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
+        lastFrameTime = 0;
+        logicAccumulator = 0;
       }
 
       function stopCurrentGame() {
@@ -1109,7 +1071,6 @@
         if (pb) pb.textContent = '⏸ Пауза';
       }
 
-      // --- Сохранение рекорда при окончании игры ---
       function saveScoreIfGameOver(game, sc) {
         if (sc > 0 && BestScores.update(game, sc)) {
           haptic('success');
@@ -1117,10 +1078,11 @@
         }
       }
 
-      // --- ИНИЦИАЛИЗАЦИЯ ---
+      // ---------- ИНИЦИАЛИЗАЦИЯ ----------
       function initSnake() {
         snake.body = [{x: 10, y: 10},{x: 9, y: 10},{x: 8, y: 10}];
         snake.dir = 'right'; snake.nextDir = 'right';
+        snakeTimer = 0;
         generateSnakeFood();
         updateScoreDisplay(0);
         gameOver = false; isPaused = false;
@@ -1194,7 +1156,7 @@
         updateBestInGame();
       }
 
-      // --- ОТРИСОВКА (без изменений в игровой логике, только цвета под тему) ---
+      // ---------- ОТРИСОВКА ----------
       function bgColor() { return document.body.classList.contains('theme-light') ? '#dfe8f2' : '#0a0f18'; }
       function gridColor() { return document.body.classList.contains('theme-light') ? '#c0d0e0' : '#1e2a3a'; }
 
@@ -1351,8 +1313,8 @@
         }
       }
 
-      // --- ЛОГИКА ---
-      function updateSnake() {
+      // ---------- ЛОГИКА ----------
+      function stepSnake() {
         if (gameOver || isPaused) return;
         if (snake.nextDir === 'up' && snake.dir !== 'down') snake.dir = 'up';
         else if (snake.nextDir === 'down' && snake.dir !== 'up') snake.dir = 'down';
@@ -1366,58 +1328,43 @@
         if (snake.dir === 'down')  newHead.y += 1;
 
         if (newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS) {
-          gameOver = true;
-          saveScoreIfGameOver('snake', score);
-          haptic('error');
-          return;
+          gameOver = true; saveScoreIfGameOver('snake', score); haptic('error'); return;
         }
         for (var i = 0; i < snake.body.length; i++) {
           if (snake.body[i].x === newHead.x && snake.body[i].y === newHead.y) {
-            gameOver = true;
-            saveScoreIfGameOver('snake', score);
-            haptic('error');
-            return;
+            gameOver = true; saveScoreIfGameOver('snake', score); haptic('error'); return;
           }
         }
-
         snake.body.unshift(newHead);
         if (newHead.x === snake.food.x && newHead.y === snake.food.y) {
-          updateScoreDisplay(score + 1);
-          haptic('light');
-          generateSnakeFood();
+          updateScoreDisplay(score + 1); haptic('light'); generateSnakeFood();
         } else {
           snake.body.pop();
         }
       }
 
-      function updateFlappy() {
+      function stepFlappy(dt) {
         if (flappyGameOver || isPaused) return;
-        flappyBird.vy += FLAPPY_GRAVITY; flappyBird.y += flappyBird.vy;
+        flappyBird.vy += FLAPPY_GRAVITY * dt;
+        flappyBird.y  += flappyBird.vy * dt * 60;
 
         if (flappyBird.y - flappyBird.radius < 0) { flappyBird.y = flappyBird.radius; flappyBird.vy = 0; }
         if (flappyBird.y + flappyBird.radius > canvas.height) {
-          flappyGameOver = true;
-          saveScoreIfGameOver('flappy', flappyScore);
-          haptic('error');
-          return;
+          flappyGameOver = true; saveScoreIfGameOver('flappy', flappyScore); haptic('error'); return;
         }
 
         for (var i = 0; i < flappyPipes.length; i++) {
-          var pipe = flappyPipes[i]; pipe.x -= FLAPPY_PIPE_SPEED;
+          var pipe = flappyPipes[i];
+          pipe.x -= FLAPPY_PIPE_SPEED * dt * 60;
           if (pipe.x + FLAPPY_PIPE_WIDTH < 0) { flappyPipes.splice(i, 1); i--; continue; }
           if (150 + flappyBird.radius > pipe.x && 150 - flappyBird.radius < pipe.x + FLAPPY_PIPE_WIDTH) {
             if (flappyBird.y - flappyBird.radius < pipe.top ||
                 flappyBird.y + flappyBird.radius > pipe.top + FLAPPY_PIPE_GAP) {
-              flappyGameOver = true;
-              saveScoreIfGameOver('flappy', flappyScore);
-              haptic('error');
-              return;
+              flappyGameOver = true; saveScoreIfGameOver('flappy', flappyScore); haptic('error'); return;
             }
           }
           if (!pipe.passed && pipe.x + FLAPPY_PIPE_WIDTH < 150) {
-            pipe.passed = true; flappyScore++;
-            updateScoreDisplay(flappyScore);
-            haptic('light');
+            pipe.passed = true; flappyScore++; updateScoreDisplay(flappyScore); haptic('light');
           }
         }
 
@@ -1426,14 +1373,15 @@
         }
       }
 
-      function updateAstro() {
+      function stepAstro(dt) {
         if (astroGameOver || isPaused) return;
 
         if (keys['ArrowLeft']  && astroPlayer.x > 10) astroPlayer.x -= ASTRO_SPEED;
         if (keys['ArrowRight'] && astroPlayer.x < canvas.width - astroPlayer.width - 10) astroPlayer.x += ASTRO_SPEED;
 
-        astroSpawnTimer++;
-        if (astroSpawnTimer % 30 === 0) {
+        astroSpawnTimer += dt;
+        if (astroSpawnTimer >= ASTRO_SPAWN_EVERY) {
+          astroSpawnTimer = 0;
           astroObstacles.push({
             x: Math.random() * (canvas.width - ASTRO_OBS_WIDTH),
             y: -ASTRO_OBS_HEIGHT,
@@ -1442,69 +1390,80 @@
         }
 
         for (var i = astroObstacles.length - 1; i >= 0; i--) {
-          var obs = astroObstacles[i]; obs.y += 3.5;
+          var obs = astroObstacles[i];
+          obs.y += ASTRO_FALL;
           if (obs.x < astroPlayer.x + astroPlayer.width &&
               obs.x + obs.w > astroPlayer.x &&
               obs.y < astroPlayer.y + astroPlayer.height &&
               obs.y + obs.h > astroPlayer.y) {
-            astroGameOver = true;
-            saveScoreIfGameOver('astro', astroScore);
-            haptic('error');
-            return;
+            astroGameOver = true; saveScoreIfGameOver('astro', astroScore); haptic('error'); return;
           }
           if (obs.y > canvas.height) {
-            astroObstacles.splice(i, 1);
-            astroScore++;
-            updateScoreDisplay(astroScore);
-            haptic('light');
+            astroObstacles.splice(i, 1); astroScore++; updateScoreDisplay(astroScore); haptic('light');
           }
         }
       }
 
-      function updateSapper() {
+      function stepSapper() {
         if (sapperGameOver || sapperWin || isPaused) return;
         var revealedCount = 0, totalSafe = SAPPER_ROWS * SAPPER_COLS - SAPPER_MINES;
         for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
           if (sapperRevealed[r][c] && sapperGrid[r][c] !== -1) revealedCount++;
         }
         if (revealedCount === totalSafe && !sapperWin) {
-          sapperWin = true;
-          saveScoreIfGameOver('sapper', score);
-          haptic('success');
+          sapperWin = true; saveScoreIfGameOver('sapper', score); haptic('success');
         }
       }
 
-      function gameLoop() {
+      // ---------- ГЛАВНЫЙ ЦИКЛ ----------
+      function mainLoop(timestamp) {
+        if (!lastFrameTime) lastFrameTime = timestamp;
+        var dt = (timestamp - lastFrameTime) / 1000;
+        lastFrameTime = timestamp;
+        if (dt > MAX_FRAME) dt = MAX_FRAME;
+
+        // Отрисовка каждый кадр
         clearCanvas();
         if (currentGame === 'snake') drawSnake();
         else if (currentGame === 'sapper') drawSapper();
         else if (currentGame === 'flappy') drawFlappy();
         else if (currentGame === 'astro') drawAstro();
-        animationFrame = requestAnimationFrame(gameLoop);
+
+        // Логика фиксированным шагом
+        if (!isPaused) {
+          logicAccumulator += dt;
+          while (logicAccumulator >= LOGIC_STEP) {
+            logicAccumulator -= LOGIC_STEP;
+
+            if (currentGame === 'snake') {
+              snakeTimer += LOGIC_STEP;
+              if (snakeTimer >= 1 / SNAKE_SPEED) {
+                snakeTimer = 0;
+                stepSnake();
+              }
+            } else if (currentGame === 'flappy') {
+              stepFlappy(LOGIC_STEP);
+            } else if (currentGame === 'astro') {
+              stepAstro(LOGIC_STEP);
+            } else if (currentGame === 'sapper') {
+              stepSapper();
+            }
+          }
+        }
+
+        animationFrame = requestAnimationFrame(mainLoop);
       }
 
       function startRenderLoop() {
         if (animationFrame) cancelAnimationFrame(animationFrame);
-        animationFrame = requestAnimationFrame(gameLoop);
+        lastFrameTime = 0;
+        logicAccumulator = 0;
+        animationFrame = requestAnimationFrame(mainLoop);
       }
 
-      function startLogicInterval() {
-        if (intervalId) clearInterval(intervalId);
-        intervalId = setInterval(function() {
-          if (isPaused) return;
-          if (currentGame === 'snake') updateSnake();
-          else if (currentGame === 'flappy') updateFlappy();
-          else if (currentGame === 'astro') updateAstro();
-          else if (currentGame === 'sapper') updateSapper();
-        }, 60);
-      }
-
-      // ---------- Кнопка Назад ----------
+      // ---------- НАЗАД ----------
       function handleBackButton() {
-        // Если открыта модалка — закрываем её и возвращаемся к списку игр
-        if (modal.classList.contains('active')) {
-          closeModalAndStop();
-        }
+        if (modal.classList.contains('active')) closeModalAndStop();
       }
 
       function closeModalAndStop() {
@@ -1513,7 +1472,6 @@
         tgHideBack();
       }
 
-      // ---------- Переключение игры ----------
       function switchGame(game) {
         stopCurrentGame();
         currentGame = game;
@@ -1526,15 +1484,12 @@
         else if (game === 'astro') initAstro();
 
         startRenderLoop();
-        startLogicInterval();
         isPaused = false;
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-
-        // Показываем кнопку «Назад» в шапке Telegram
         tgShowBack(handleBackButton);
       }
 
-      // ---------- Клавиатура ----------
+      // ---------- ВВОД ----------
       window.addEventListener('keydown', function(e) {
         keys[e.key] = true;
         if (currentGame === 'snake') {
@@ -1548,17 +1503,13 @@
           if (!flappyGameOver && !isPaused) { flappyBird.vy = FLAPPY_JUMP; haptic('light'); }
         }
         if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
-          e.preventDefault();
-          restartCurrentGame();
+          e.preventDefault(); restartCurrentGame();
         }
-        if (e.key === 'Escape') {
-          closeModalAndStop();
-        }
+        if (e.key === 'Escape') closeModalAndStop();
       });
 
       window.addEventListener('keyup', function(e) { keys[e.key] = false; });
 
-      // ---------- Клики по canvas ----------
       var longPressTimer = null;
       var isLongPress = false;
 
@@ -1586,13 +1537,13 @@
               revealSapperCell(r, c);
               updateScoreDisplay(score + 1);
               haptic('light');
-              updateSapper();
+              stepSapper();
             }
           }
         } else if (currentGame === 'astro') {
-          var rect = canvas.getBoundingClientRect();
-          var tapX = e.clientX - rect.left;
-          if (tapX < rect.width / 2) astroPlayer.x = Math.max(10, astroPlayer.x - 40);
+          var rect2 = canvas.getBoundingClientRect();
+          var tapX = e.clientX - rect2.left;
+          if (tapX < rect2.width / 2) astroPlayer.x = Math.max(10, astroPlayer.x - 40);
           else astroPlayer.x = Math.min(canvas.width - astroPlayer.width - 10, astroPlayer.x + 40);
           haptic('light');
         }
@@ -1656,10 +1607,8 @@
         }
       }
 
-      // ---------- Кнопки управления ----------
       document.getElementById('restartBtn').addEventListener('click', function() {
-        haptic('medium');
-        restartCurrentGame();
+        haptic('medium'); restartCurrentGame();
       });
 
       document.getElementById('pauseBtn').addEventListener('click', function() {
@@ -1679,7 +1628,6 @@
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
       }
 
-      // ---------- Открытие/закрытие модалки ----------
       var cards = document.querySelectorAll('.game-card');
       for (var i = 0; i < cards.length; i++) {
         cards[i].addEventListener('click', function() {
@@ -1690,25 +1638,12 @@
       }
 
       document.getElementById('closeModal').addEventListener('click', function() {
-        haptic('light');
-        closeModalAndStop();
+        haptic('light'); closeModalAndStop();
       });
 
       modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          haptic('light');
-          closeModalAndStop();
-        }
+        if (e.target === modal) { haptic('light'); closeModalAndStop(); }
       });
-
-      // При уходе из WebApp — сохраняем текущий счёт (на случай долгой игры)
-      if (TG) {
-        try {
-          TG.onEvent('viewportChanged', function() {
-            // ничего не делаем, просто заглушка
-          });
-        } catch(e){}
-      }
     })();
   </script>
 </body>
