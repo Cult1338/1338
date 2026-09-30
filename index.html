@@ -927,7 +927,7 @@
       <div class="game-card" data-game="pudge">
         <div class="best-score" data-best="pudge">★ <span>0</span></div>
         <h3>🪝 PUDGE HOOK</h3>
-        <p>Ты — Pudge. Целься мышкой или тапом и лови мясные цели крюком.</p>
+        <p>Ты — Pudge. Крюком ловишь ранги Dota 2, проплывающие мимо.</p>
       </div>
 
       <div class="game-card" data-game="snake">
@@ -1247,7 +1247,7 @@
     })();
 
     // ============================================================
-    // ИГРОВОЙ ДВИЖОК (delta-time) + PUDGE HOOK
+    // ИГРОВОЙ ДВИЖОК + PUDGE HOOK (с рангами Dota 2)
     // ============================================================
     (function() {
       var canvas = document.getElementById('gameCanvas');
@@ -1314,7 +1314,18 @@
       var PUDGE_TARGETS_BASE = 4;
       var pudgeSpawnTimer = 0;
       var pudgeSpawnEvery = 1.4;
-      var TARGET_COLORS = ['#ff6b6b', '#ffb347', '#ff8fab', '#c77dff', '#6bcf7f'];
+
+      // Ранги Dota 2
+      var DOTA_RANKS = [
+        { key: 'herald',   color: '#7cb342', accent: '#9ccc65', label: 'H' },
+        { key: 'guardian', color: '#8d6e63', accent: '#a1887f', label: 'G' },
+        { key: 'crusader', color: '#26a69a', accent: '#4db6ac', label: 'C' },
+        { key: 'archon',   color: '#66bb6a', accent: '#81c784', label: 'A' },
+        { key: 'legend',   color: '#ab47bc', accent: '#ce93d8', label: 'L' },
+        { key: 'ancient',  color: '#7986cb', accent: '#9fa8da', label: 'N' },
+        { key: 'divine',   color: '#42a5f5', accent: '#64b5f6', label: 'D' },
+        { key: 'immortal', color: '#ffb300', accent: '#ffca28', label: 'I' }
+      ];
 
       var keys = {};
 
@@ -1335,7 +1346,7 @@
         document.getElementById('pauseBtn').textContent = '⏸ Пауза';
         updateBestInGame();
         for (var i = 0; i < PUDGE_TARGETS_BASE; i++) {
-          spawnPudgeTarget(true);
+          spawnPudgeTarget();
         }
       }
 
@@ -1343,13 +1354,12 @@
         var laneY = 80 + Math.random() * 220;
         var speed = 1.2 + Math.random() * 1.2 + pudgeScore * 0.05;
         var dir = Math.random() < 0.5 ? 1 : -1;
-        var color = TARGET_COLORS[Math.floor(Math.random() * TARGET_COLORS.length)];
-        var startX = dir > 0 ? -30 : canvas.width + 30;
-        var shapes = ['meat', 'meat', 'meat', 'crystal', 'sausage'];
-        var shape = shapes[Math.floor(Math.random() * shapes.length)];
+        var rank = DOTA_RANKS[Math.floor(Math.random() * DOTA_RANKS.length)];
+        var startX = dir > 0 ? -40 : canvas.width + 40;
         pudgeTargets.push({
           x: startX, y: laneY, vx: dir * speed,
-          w: 34, h: 26, color: color, shape: shape,
+          w: 28, h: 28,
+          rank: rank,
           wobble: Math.random() * Math.PI * 2
         });
       }
@@ -1394,7 +1404,7 @@
           for (var i = 0; i < pudgeTargets.length; i++) {
             var t = pudgeTargets[i];
             var dx = hook.x - t.x, dy = hook.y - t.y;
-            if (Math.sqrt(dx * dx + dy * dy) < 22) {
+            if (Math.sqrt(dx * dx + dy * dy) < 26) {
               t.caught = true;
               hook.state = 'returning';
               pudgeMisses = 0;
@@ -1535,58 +1545,64 @@
       function drawPudgeTarget(t) {
         ctx.save();
         ctx.translate(t.x, t.y);
-        ctx.rotate(Math.sin(t.wobble) * 0.15);
+        ctx.rotate(Math.sin(t.wobble) * 0.12);
 
-        if (t.shape === 'meat') {
-          ctx.shadowColor = t.color;
-          ctx.shadowBlur = 12;
-          ctx.fillStyle = t.color;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, t.w / 2, t.h / 2, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = '#f5e6c8';
-          ctx.fillRect(-3, -t.h / 2 - 4, 6, 8);
-          ctx.beginPath();
-          ctx.arc(-4, -t.h / 2 - 4, 3, 0, Math.PI * 2);
-          ctx.arc(4, -t.h / 2 - 4, 3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = 'rgba(255,255,255,0.5)';
-          ctx.beginPath();
-          ctx.ellipse(-5, -5, 6, 4, -0.5, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (t.shape === 'crystal') {
-          ctx.shadowColor = t.color;
-          ctx.shadowBlur = 18;
-          ctx.fillStyle = t.color;
-          ctx.beginPath();
-          ctx.moveTo(0, -t.h / 2 - 4);
-          ctx.lineTo(t.w / 2, 0);
-          ctx.lineTo(0, t.h / 2 + 4);
-          ctx.lineTo(-t.w / 2, 0);
-          ctx.closePath();
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(255,255,255,0.6)';
-          ctx.beginPath();
-          ctx.moveTo(0, -t.h / 2 - 4);
-          ctx.lineTo(t.w / 4, -t.h / 4);
-          ctx.lineTo(0, 0);
-          ctx.closePath();
-          ctx.fill();
-        } else {
-          ctx.shadowColor = t.color;
-          ctx.shadowBlur = 10;
-          ctx.fillStyle = t.color;
-          ctx.beginPath();
-          ctx.roundRect(-t.w / 2, -t.h / 4, t.w, t.h / 2, t.h / 4);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(255,255,255,0.4)';
-          ctx.beginPath();
-          ctx.roundRect(-t.w / 2 + 4, -t.h / 4 + 3, t.w - 8, 4, 2);
-          ctx.fill();
+        var r = t.rank;
+        var size = t.w / 2;
+
+        ctx.shadowColor = r.color;
+        ctx.shadowBlur = 12;
+
+        ctx.fillStyle = r.color;
+        ctx.beginPath();
+        ctx.moveTo(0, -size);
+        ctx.lineTo(size * 0.9, -size * 0.4);
+        ctx.lineTo(size * 0.9, size * 0.3);
+        ctx.lineTo(0, size);
+        ctx.lineTo(-size * 0.9, size * 0.3);
+        ctx.lineTo(-size * 0.9, -size * 0.4);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = r.accent;
+        ctx.beginPath();
+        ctx.moveTo(0, -size * 0.55);
+        ctx.lineTo(size * 0.45, 0);
+        ctx.lineTo(0, size * 0.55);
+        ctx.lineTo(-size * 0.45, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Звезда сверху
+        ctx.fillStyle = '#ffe066';
+        ctx.beginPath();
+        var starX = 0, starY = -size - 4;
+        var starR = 3;
+        for (var i = 0; i < 5; i++) {
+          var angle = -Math.PI / 2 + i * (Math.PI * 2 / 5);
+          var x1 = starX + Math.cos(angle) * starR;
+          var y1 = starY + Math.sin(angle) * starR;
+          var angle2 = angle + Math.PI / 5;
+          var x2 = starX + Math.cos(angle2) * starR * 0.45;
+          var y2 = starY + Math.sin(angle2) * starR * 0.45;
+          if (i === 0) ctx.moveTo(x1, y1); else ctx.lineTo(x1, y1);
+          ctx.lineTo(x2, y2);
         }
+        ctx.closePath();
+        ctx.fill();
+
+        // Блик
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.beginPath();
+        ctx.ellipse(-size * 0.35, -size * 0.4, size * 0.25, size * 0.12, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
       }
 
@@ -2114,150 +2130,4 @@
 
         if (isLongPress) { isLongPress = false; return; }
 
-        if (currentGame === 'flappy') {
-          if (!flappyGameOver && !isPaused) { flappyBird.vy = FLAPPY_JUMP; haptic('light'); }
-        } else if (currentGame === 'sapper') {
-          if (sapperGameOver || sapperWin || isPaused) return;
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-          var mouseX = (e.clientX - rect.left) * scaleX, mouseY = (e.clientY - rect.top) * scaleY;
-          var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-          var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
-
-          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
-            if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
-            if (sapperGrid[r][c] === -1) {
-              sapperGameOver = true;
-              sapperRevealed[r][c] = true;
-              saveScoreIfGameOver('sapper', score);
-              haptic('error');
-            } else {
-              revealSapperCell(r, c);
-              updateScoreDisplay(score + 1);
-              haptic('light');
-              stepSapper();
-            }
-          }
-        } else if (currentGame === 'astro') {
-          var rect2 = canvas.getBoundingClientRect();
-          var tapX = e.clientX - rect2.left;
-          if (tapX < rect2.width / 2) astroPlayer.x = Math.max(10, astroPlayer.x - 40);
-          else astroPlayer.x = Math.min(canvas.width - astroPlayer.width - 10, astroPlayer.x + 40);
-          haptic('light');
-        }
-      });
-
-      canvas.addEventListener('touchstart', function(e) {
-        if (currentGame === 'pudge') {
-          if (pudgeGameOver || isPaused) return;
-          var touch = e.touches[0];
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width;
-          var scaleY = canvas.height / rect.height;
-          var mx = (touch.clientX - rect.left) * scaleX;
-          var my = (touch.clientY - rect.top) * scaleY;
-          launchHook(mx, my);
-          e.preventDefault();
-          return;
-        }
-
-        if (currentGame !== 'sapper') return;
-        if (sapperGameOver || sapperWin || isPaused) return;
-        var touch = e.touches[0];
-        var rect = canvas.getBoundingClientRect();
-        var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-        var mouseX = (touch.clientX - rect.left) * scaleX, mouseY = (touch.clientY - rect.top) * scaleY;
-        var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-        var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
-        isLongPress = false;
-        longPressTimer = setTimeout(function() {
-          isLongPress = true;
-          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
-            if (sapperRevealed[r][c]) return;
-            sapperFlags[r][c] = !sapperFlags[r][c];
-            haptic('medium');
-          }
-        }, 400);
-      }, { passive: false });
-
-      canvas.addEventListener('touchend', function() {
-        if (longPressTimer) clearTimeout(longPressTimer);
-      });
-
-      canvas.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        if (currentGame === 'sapper') {
-          if (sapperGameOver || sapperWin || isPaused) return;
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-          var mouseX = (e.clientX - rect.left) * scaleX, mouseY = (e.clientY - rect.top) * scaleY;
-          var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-          var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
-          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
-            if (sapperRevealed[r][c]) return;
-            sapperFlags[r][c] = !sapperFlags[r][c];
-            haptic('medium');
-          }
-        }
-      });
-
-      function revealSapperCell(r, c) {
-        if (r < 0 || r >= SAPPER_ROWS || c < 0 || c >= SAPPER_COLS) return;
-        if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
-        if (sapperGrid[r][c] === -1) {
-          sapperGameOver = true;
-          sapperRevealed[r][c] = true;
-          return;
-        }
-        sapperRevealed[r][c] = true;
-        if (sapperGrid[r][c] === 0) {
-          for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            revealSapperCell(r + dr, c + dc);
-          }
-        }
-      }
-
-      document.getElementById('restartBtn').addEventListener('click', function() {
-        haptic('medium'); restartCurrentGame();
-      });
-
-      document.getElementById('pauseBtn').addEventListener('click', function() {
-        if (gameOver && currentGame !== 'sapper') return;
-        if (currentGame === 'sapper' && (sapperGameOver || sapperWin)) return;
-        if (currentGame === 'pudge' && pudgeGameOver) return;
-        isPaused = !isPaused;
-        this.textContent = isPaused ? '▶ Продолжить' : '⏸ Пауза';
-        haptic('light');
-      });
-
-      function restartCurrentGame() {
-        if (currentGame === 'snake') initSnake();
-        else if (currentGame === 'sapper') initSapper();
-        else if (currentGame === 'flappy') initFlappy();
-        else if (currentGame === 'astro') initAstro();
-        else if (currentGame === 'pudge') initPudge();
-        isPaused = false; gameOver = false;
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-      }
-
-      var cards = document.querySelectorAll('.game-card');
-      for (var i = 0; i < cards.length; i++) {
-        cards[i].addEventListener('click', function() {
-          haptic('medium');
-          modal.classList.add('active');
-          switchGame(this.getAttribute('data-game'));
-        });
-      }
-
-      document.getElementById('closeModal').addEventListener('click', function() {
-        haptic('light'); closeModalAndStop();
-      });
-
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) { haptic('light'); closeModalAndStop(); }
-      });
-    })();
-  </script>
-</body>
-</html>
+        if (currentGame
