@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cult1338 — Игры</title>
+  <style>
+    /* ---------- ШРИФТЫ И БАЗОВЫЕ СТИЛИ ---------- */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #04070d;
+      color: #eaf4ff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      position: relative;
+    }
+
+    /* ---------- ФОН: ЗАТЕМНЁННЫЙ ЛЕС ---------- */
+    .bg-forest {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: brightness(0.25) saturate(0.6) hue-rotate(180deg);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Затемняющий слой + лёгкая синева */
+    .bg-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(180deg, rgba(2,8,20,0.85) 0%, rgba(1,4,12,0.95) 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Canvas для снежинок */
+    #snowCanvas {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Тонкая сетка поверх фона (едва заметная) */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        linear-gradient(rgba(180, 220, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(180, 220, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Ледяное свечение сверху */
+    .glow-top {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(120, 200, 255, 0.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(70px);
+    }
+
+    /* ---------- НАВИГАЦИЯ (ПЛАШКА) ---------- */
+    header {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(5, 12, 24, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(120, 200, 255, 0.18);
+      border-radius: 50px;
+      padding: 12px 20px;
+      width: 90%;
+      max-width: 900px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(120, 200, 255, 0.08);
+    }
+
+    .header-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 0%, #7fd4ff 60%, #4aa8e0 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 30px rgba(120, 200, 255, 0.4);
+      margin: 0;
+      line-height: 1;
+      white-space: nowrap;
+      min-height: 34px;
+    }
+
+    .header-text::after {
+      content: '|';
+      color: #7fd4ff;
+      font-weight: 300;
+      margin-left: 4px;
+      animation: blink 1s step-end infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0; }
+    }
+
+    /* ---------- ГЛАВНЫЙ ЭКРАН ---------- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      padding: 120px 20px 60px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 8vw, 90px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      max-width: 1000px;
+      color: #ffffff;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.9), 0 0 60px rgba(120, 200, 255, 0.15);
+    }
+
+    .hero h1 .italic-red {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: #7fd4ff;
+      text-transform: none;
+      font-size: clamp(36px, 7vw, 80px);
+      margin-top: -10px;
+      text-shadow: 0 0 40px rgba(120, 200, 255, 0.5);
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: rgba(10, 25, 45, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(120, 200, 255, 0.35);
+      color: #eaf4ff;
+      padding: 16px 32px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary:hover {
+      border-color: #7fd4ff;
+      background: rgba(120, 200, 255, 0.15);
+      box-shadow: 0 0 25px rgba(120, 200, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Стрелочка вниз */
+    .arrow-down {
+      margin-top: 80px;
+      animation: bounce 2s infinite;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .arrow-down:hover {
+      opacity: 1;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* ---------- СЕКЦИЯ С ИГРАМИ ---------- */
+    .games-section {
+      padding: 100px 20px 150px;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 60px;
+      color: #ffffff;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+    }
+
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 50px;
+      background: #7fd4ff;
+      box-shadow: 0 0 20px rgba(120, 200, 255, 0.7);
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+
+    .game-card {
+      background: rgba(6, 14, 26, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(120, 200, 255, 0.15);
+      border-radius: 12px;
+      padding: 30px 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .game-card:hover {
+      border-color: rgba(120, 200, 255, 0.6);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.7), 0 0 30px rgba(120, 200, 255, 0.2);
+      background: rgba(10, 22, 40, 0.8);
+    }
+
+    .game-card::after {
+      content: '→';
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      font-size: 20px;
+      color: rgba(120, 200, 255, 0.3);
+      transition: all 0.3s;
+    }
+
+    .game-card:hover::after {
+      color: #7fd4ff;
+      transform: translateX(5px);
+      text-shadow: 0 0 15px rgba(120, 200, 255, 0.8);
+    }
+
+    .game-card h3 {
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      color: #eaf4ff;
+      text-shadow: 0 0 20px rgba(120, 200, 255, 0.3);
+    }
+
+    .game-card p {
+      font-size: 13px;
+      color: #8ba8c5;
+      line-height: 1.5;
+      max-width: 90%;
+    }
+
+    /* ---------- МОДАЛЬНОЕ ОКНО С ИГРОЙ ---------- */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(2, 6, 14, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #060e1a;
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(120, 200, 255, 0.15) inset, 0 0 50px rgba(120, 200, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      border-bottom: 1px solid rgba(120, 200, 255, 0.12);
+      background: rgba(10, 22, 40, 0.5);
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #eaf4ff;
+    }
+
+    .modal-header h2 span:first-child {
+      color: #7fd4ff;
+      text-shadow: 0 0 15px rgba(120, 200, 255, 0.7);
+    }
+
+    .close-btn {
+      background: transparent;
+      border: 1px solid rgba(120, 200, 255, 0.3);
+      color: #8ba8c5;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: #7fd4ff;
+      border-color: #7fd4ff;
+      color: #04070d;
+      box-shadow: 0 0 20px rgba(120, 200, 255, 0.6);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #04070d;
+    }
+
+    .game-score-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 10px;
+    }
+
+    .game-score-bar .score-label {
+      color: #6b86a3;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .game-score-bar .score-value {
+      color: #7fd4ff;
+      font-size: 24px;
+      font-weight: 800;
+      font-family: 'Inter', sans-serif;
+      text-shadow: 0 0 15px rgba(120, 200, 255, 0.5);
+    }
+
+    canvas#gameCanvas {
+      display: block;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+      aspect-ratio: 2 / 1;
+      background: #0a0f18;
+      border: 1px solid rgba(120, 200, 255, 0.15);
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6) inset;
+    }
+
+    .game-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .ctrl-btn {
+      background: rgba(10, 22, 40, 0.7);
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      color: #c8dff0;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .ctrl-btn:hover {
+      border-color: #7fd4ff;
+      color: #fff;
+      background: rgba(120, 200, 255, 0.12);
+      box-shadow: 0 0 20px rgba(120, 200, 255, 0.2);
+    }
+
+    .game-hint {
+      margin-top: 16px;
+      color: #5a7a96;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    /* Адаптив */
+    @media (max-width: 600px) {
+      header {
+        padding: 10px 12px;
+        width: 95%;
+      }
+      .header-text {
+        font-size: 18px;
+        letter-spacing: 4px;
+      }
+      .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+      .modal-body {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ФОН: ЛЕС + СНЕГ -->
+  <div class="bg-forest"></div>
+  <div class="bg-overlay"></div>
+  <canvas id="snowCanvas"></canvas>
+  <div class="glow-top"></div>
+
+  <!-- НАВИГАЦИЯ (ПЛАШКА С АНИМАЦИЕЙ ПЕЧАТИ) -->
+  <header>
+    <div class="header-text" id="typewriterHeader"></div>
+  </header>
+
+  <!-- ГЛАВНЫЙ ЭКРАН -->
+  <section class="hero">
+    <h1>
+      НОВЫЙ ВЗГЛЯД НА<br>
+      <span class="italic-red">игры</span>
+    </h1>
+    <div class="hero-buttons">
+      <button class="btn-primary" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">
+        ИГРАТЬ В ИГРЫ
+      </button>
+    </div>
+    <div class="arrow-down" onclick="document.getElementById('games').scrollIntoView({behavior: 'smooth'})">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7fd4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ ИГР -->
+  <section class="games-section" id="games">
+    <div class="section-title">ИГРЫ</div>
+    <div class="games-grid">
+      
+      <div class="game-card" data-game="snake">
+        <h3>🐍 ЗМЕЙКА</h3>
+        <p>Классика. Управляй стрелками, собирай еду и не врезайся в себя.</p>
+      </div>
+
+      <div class="game-card" data-game="sapper">
+        <h3>💣 САПЁР</h3>
+        <p>Логическая игра. ЛКМ — открыть, ПКМ — флаг. Найди все мины.</p>
+      </div>
+
+      <div class="game-card" data-game="flappy">
+        <h3>🐦 FLAPPY BIRD</h3>
+        <p>Пролетай между трубами. Пробел или клик — взмах крыльев.</p>
+      </div>
+
+      <div class="game-card" data-game="astro">
+        <h3>🚀 КОСМО-ДОДЖ</h3>
+        <p>Уклоняйся от астероидов. Стрелки влево/вправо — движение.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- МОДАЛЬНОЕ ОКНО С ИГРОЙ -->
+  <div class="modal-overlay" id="gameModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><span>▶</span> <span id="modalGameTitle">ЗМЕЙКА</span></h2>
+        <button class="close-btn" id="closeModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="game-score-bar">
+          <span class="score-label">Счёт</span>
+          <span class="score-value" id="scoreDisplay">0</span>
+        </div>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div class="game-controls">
+          <button class="ctrl-btn" id="restartBtn">⟳ Заново</button>
+          <button class="ctrl-btn" id="pauseBtn">⏸ Пауза</button>
+        </div>
+        <div class="game-hint" id="hintText">Стрелки – управление, R – рестарт</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== АНИМАЦИЯ СНЕЖИНОК ==========
+    (function snowAnimation() {
+      const canvas = document.getElementById('snowCanvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let snowflakes = [];
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const SNOW_COUNT = 200;
+
+      function createSnowflake() {
+        return {
+          x: Math.random() * width,
+          y: Math.random() * height - height,
+          radius: Math.random() * 2.5 + 0.5,
+          speed: Math.random() * 1.2 + 0.4,
+          drift: Math.random() * 0.6 - 0.3,
+          opacity: Math.random() * 0.6 + 0.3,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: Math.random() * 0.02 + 0.005
+        };
+      }
+
+      for (let i = 0; i < SNOW_COUNT; i++) {
+        const flake = createSnowflake();
+        flake.y = Math.random() * height;
+        snowflakes.push(flake);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#ffffff';
+
+        snowflakes.forEach((flake, i) => {
+          flake.wobble += flake.wobbleSpeed;
+          flake.x += Math.sin(flake.wobble) * 0.5 + flake.drift;
+          flake.y += flake.speed;
+
+          if (flake.y > height + 10) {
+            snowflakes[i] = createSnowflake();
+            snowflakes[i].y = -10;
+          }
+          if (flake.x > width + 10) flake.x = -10;
+          if (flake.x < -10) flake.x = width + 10;
+
+          ctx.globalAlpha = flake.opacity;
+          ctx.beginPath();
+          ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Лёгкое свечение для крупных снежинок
+          if (flake.radius > 1.8) {
+            ctx.globalAlpha = flake.opacity * 0.3;
+            ctx.beginPath();
+            ctx.arc(flake.x, flake.y, flake.radius * 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ========== АНИМАЦИЯ ПЕЧАТИ CULT1338 ==========
+    (function typewriterEffect() {
+      const el = document.getElementById('typewriterHeader');
+      const fullText = 'CULT1338';
+      let index = 0;
+      let isDeleting = false;
+
+      function tick() {
+        if (!isDeleting) {
+          index++;
+          el.textContent = fullText.slice(0, index);
+          if (index === fullText.length) {
+            setTimeout(() => {
+              isDeleting = true;
+              tick();
+            }, 10000);
+            return;
+          }
+          setTimeout(tick, 180);
+        } else {
+          index--;
+          el.textContent = fullText.slice(0, index);
+          if (index === 0) {
+            isDeleting = false;
+            setTimeout(tick, 500);
+            return;
+          }
+          setTimeout(tick, 80);
+        }
+      }
+      setTimeout(tick, 300);
+    })();
+
+    // ========== ИГРОВОЙ ДВИЖОК ==========
+    (function() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      const modalGameTitle = document.getElementById('modalGameTitle');
+      const hintText = document.getElementById('hintText');
+      const modal = document.getElementById('gameModal');
+
+      let currentGame = 'snake';
+      let score = 0;
+      let isPaused = false;
+      let gameOver = false;
+      let animationFrame = null;
+      let intervalId = null;
+      let lastTimestamp = 0;
+
+      let snake = { body: [], dir: 'right', nextDir: 'right', food: {x:10,y:10} };
+      const COLS = 40, ROWS = 20, CELL = 20;
+
+      let sapperGrid = [];
+      let sapperRevealed = [];
+      let sapperFlags = [];
+      let sapperGameOver = false;
+      let sapperWin = false;
+      const SAPPER_COLS = 16, SAPPER_ROWS = 8, SAPPER_MINES = 12;
+
+      let flappyBird = { y: 200, vy: 0, radius: 15 };
+      let flappyPipes = [];
+      let flappyScore = 0;
+      let flappyGameOver = false;
+      const FLAPPY_GRAVITY = 0.5;
+      const FLAPPY_JUMP = -8;
+      const FLAPPY_PIPE_WIDTH = 60;
+      const FLAPPY_PIPE_GAP = 130;
+      const FLAPPY_PIPE_SPEED = 3;
+
+      let astroPlayer = { x: 400, y: 340, width: 30, height: 30 };
+      let astroObstacles = [];
+      let astroScore = 0;
+      let astroGameOver = false;
+      let astroSpawnTimer = 0;
+      const ASTRO_SPEED = 4;
+      const ASTRO_OBS_WIDTH = 40;
+      const ASTRO_OBS_HEIGHT = 40;
+
+      const keys = {};
+
+      function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+      function updateScoreDisplay(val) { score = val; scoreDisplay.textContent = val; }
+      
+      function stopAllIntervals() {
+        if (intervalId) { clearInterval(intervalId); intervalId = null; }
+        if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
+      }
+
+      function stopCurrentGame() {
+        stopAllIntervals();
+        isPaused = false;
+        gameOver = false;
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+      }
+
+      function initSnake() {
+        snake.body = [{x: 10, y: 10},{x: 9, y: 10},{x: 8, y: 10}];
+        snake.dir = 'right'; snake.nextDir = 'right';
+        generateSnakeFood(); updateScoreDisplay(0); gameOver = false; isPaused = false;
+        hintText.textContent = 'Стрелки – управление, R – рестарт';
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+      }
+
+      function generateSnakeFood() {
+        let freeCells = [];
+        for (let i = 0; i < COLS; i++) for (let j = 0; j < ROWS; j++)
+          if (!snake.body.some(seg => seg.x === i && seg.y === j)) freeCells.push({x: i, y: j});
+        if (freeCells.length === 0) return;
+        snake.food = freeCells[Math.floor(Math.random() * freeCells.length)];
+      }
+
+      function initSapper() {
+        sapperGrid = Array(SAPPER_ROWS).fill().map(() => Array(SAPPER_COLS).fill(0));
+        sapperRevealed = Array(SAPPER_ROWS).fill().map(() => Array(SAPPER_COLS).fill(false));
+        sapperFlags = Array(SAPPER_ROWS).fill().map(() => Array(SAPPER_COLS).fill(false));
+        sapperGameOver = false; sapperWin = false;
+        let minesPlaced = 0;
+        while (minesPlaced < SAPPER_MINES) {
+          const r = Math.floor(Math.random() * SAPPER_ROWS);
+          const c = Math.floor(Math.random() * SAPPER_COLS);
+          if (sapperGrid[r][c] !== -1) { sapperGrid[r][c] = -1; minesPlaced++; }
+        }
+        for (let r = 0; r < SAPPER_ROWS; r++) for (let c = 0; c < SAPPER_COLS; c++) {
+          if (sapperGrid[r][c] === -1) continue;
+          let cnt = 0;
+          for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+            const nr = r + dr, nc = c + dc;
+            if (nr >= 0 && nr < SAPPER_ROWS && nc >= 0 && nc < SAPPER_COLS && sapperGrid[nr][nc] === -1) cnt++;
+          }
+          sapperGrid[r][c] = cnt;
+        }
+        updateScoreDisplay(0);
+        hintText.textContent = 'ЛКМ – открыть, ПКМ – флаг';
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+      }
+
+      function initFlappy() {
+        flappyBird = { y: 200, vy: 0, radius: 15 };
+        flappyPipes = []; flappyScore = 0; flappyGameOver = false; isPaused = false;
+        updateScoreDisplay(0);
+        hintText.textContent = 'Пробел / клик – взмах';
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+        for (let i = 0; i < 3; i++) flappyPipes.push({ x: 700 + i * 250, top: 100 + Math.random() * 150, passed: false });
+      }
+
+      function initAstro() {
+        astroPlayer = { x: 400, y: 340, width: 30, height: 30 };
+        astroObstacles = []; astroScore = 0; astroGameOver = false; astroSpawnTimer = 0; isPaused = false;
+        updateScoreDisplay(0);
+        hintText.textContent = '← → – движение, уклоняйся!';
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+      }
+
+      function drawSnake() {
+        ctx.fillStyle = '#0a0f18'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#1e2a3a'; ctx.lineWidth = 0.5;
+        for (let i = 0; i <= COLS; i++) { ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke(); }
+        for (let i = 0; i <= ROWS; i++) { ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke(); }
+        
+        ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 18; ctx.fillStyle = '#ff4d6d';
+        ctx.beginPath(); ctx.arc(snake.food.x * CELL + CELL/2, snake.food.y * CELL + CELL/2, CELL/2 - 2, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        snake.body.forEach((seg, idx) => {
+          const gradient = ctx.createRadialGradient(seg.x*CELL+4, seg.y*CELL+4, 2, seg.x*CELL+10, seg.y*CELL+10, 16);
+          if (idx === 0) { gradient.addColorStop(0, '#b0f0ff'); gradient.addColorStop(1, '#3b82f6'); }
+          else { gradient.addColorStop(0, '#6ea8ff'); gradient.addColorStop(1, '#1e40af'); }
+          ctx.fillStyle = gradient;
+          ctx.shadowColor = idx === 0 ? '#00ffff' : '#2563eb';
+          ctx.shadowBlur = idx === 0 ? 18 : 10;
+          ctx.beginPath(); ctx.roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, 5); ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+        if (gameOver) { ctx.font = 'bold 40px "Inter"'; ctx.fillStyle = '#ffffffdd'; ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.fillText('ИГРА ОКОНЧЕНА', 200, 200); ctx.shadowBlur = 0; }
+        if (isPaused) { ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc'; ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.fillText('ПАУЗА', 300, 200); ctx.shadowBlur = 0; }
+      }
+
+      function drawSapper() {
+        ctx.fillStyle = '#0a0f18'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const cellW = canvas.width / SAPPER_COLS; const cellH = canvas.height / SAPPER_ROWS;
+        for (let r = 0; r < SAPPER_ROWS; r++) for (let c = 0; c < SAPPER_COLS; c++) {
+          const x = c * cellW; const y = r * cellH;
+          if (sapperRevealed[r][c]) {
+            ctx.fillStyle = '#1e2a3f'; ctx.fillRect(x, y, cellW-2, cellH-2);
+            if (sapperGrid[r][c] === -1) { ctx.font = `${cellH*0.8}px "Inter"`; ctx.fillStyle = '#ff4d6d'; ctx.fillText('💣', x+6, y+cellH-8); }
+            else if (sapperGrid[r][c] > 0) { ctx.font = `bold ${cellH*0.7}px "Inter"`; ctx.fillStyle = '#9ac8ff'; ctx.fillText(sapperGrid[r][c], x+10, y+cellH-10); }
+          } else {
+            ctx.fillStyle = sapperFlags[r][c] ? '#2a3a5a' : '#141e2c'; ctx.fillRect(x, y, cellW-2, cellH-2);
+            if (sapperFlags[r][c]) { ctx.font = `${cellH*0.7}px "Inter"`; ctx.fillStyle = '#7fd4ff'; ctx.fillText('⚑', x+8, y+cellH-8); }
+          }
+          ctx.strokeStyle = '#2f405a'; ctx.strokeRect(x, y, cellW-2, cellH-2);
+        }
+        if (sapperGameOver) { ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ff8888'; ctx.shadowBlur = 20; ctx.shadowColor = 'red'; ctx.fillText('💥 БУМ!', 300, 200); ctx.shadowBlur = 0; }
+        else if (sapperWin) { ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#a0ffb0'; ctx.shadowBlur = 20; ctx.shadowColor = '#00ff88'; ctx.fillText('ПОБЕДА!', 300, 200); ctx.shadowBlur = 0; }
+        if (isPaused) { ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc'; ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.fillText('ПАУЗА', 300, 200); ctx.shadowBlur = 0; }
+      }
+
+      function drawFlappy() {
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#0b1424'); grad.addColorStop(1, '#1a2a3a');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.shadowBlur = 20; ctx.shadowColor = '#7fd4ff';
+        flappyPipes.forEach(pipe => {
+          ctx.fillStyle = '#2d4b6e';
+          ctx.fillRect(pipe.x, 0, FLAPPY_PIPE_WIDTH, pipe.top);
+          ctx.fillRect(pipe.x, pipe.top + FLAPPY_PIPE_GAP, FLAPPY_PIPE_WIDTH, canvas.height - (pipe.top + FLAPPY_PIPE_GAP));
+          ctx.fillStyle = '#5f8ec9';
+          ctx.fillRect(pipe.x + 5, 0, 8, pipe.top);
+          ctx.fillRect(pipe.x + 5, pipe.top + FLAPPY_PIPE_GAP, 8, canvas.height - (pipe.top + FLAPPY_PIPE_GAP));
+        });
+        ctx.shadowBlur = 0;
+        ctx.shadowBlur = 24; ctx.shadowColor = '#fbbf24'; ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(150, flappyBird.y, flappyBird.radius, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#000000'; ctx.beginPath(); ctx.arc(155, flappyBird.y-4, 4, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(156, flappyBird.y-5, 2, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+        if (flappyGameOver) { ctx.font = 'bold 40px "Inter"'; ctx.fillStyle = '#ffffffdd'; ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.fillText('УПАЛ...', 300, 200); ctx.shadowBlur = 0; }
+        if (isPaused) { ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc'; ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.fillText('ПАУЗА', 300, 200); ctx.shadowBlur = 0; }
+      }
+
+      function drawAstro() {
+        ctx.fillStyle = '#05080f'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 100; i++) {
+          if (i % 2 === 0) continue;
+          ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.random()*0.5})`;
+          ctx.beginPath(); ctx.arc((i*37)%800, (i*53)%400, 1.5, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.shadowBlur = 28; ctx.shadowColor = '#00ffff'; ctx.fillStyle = '#a0e0ff';
+        ctx.beginPath(); ctx.roundRect(astroPlayer.x, astroPlayer.y, astroPlayer.width, astroPlayer.height, 8); ctx.fill();
+        ctx.shadowBlur = 20; ctx.shadowColor = '#ff3366'; astroObstacles.forEach(obs => {
+          ctx.fillStyle = '#ff4d6d'; ctx.beginPath(); ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8); ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+        if (astroGameOver) { ctx.font = 'bold 40px "Inter"'; ctx.fillStyle = '#ffffffdd'; ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.fillText('СТОЛКНОВЕНИЕ', 200, 200); ctx.shadowBlur = 0; }
+        if (isPaused) { ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc'; ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.fillText('ПАУЗА', 300, 200); ctx.shadowBlur = 0; }
+      }
+
+      function updateSnake() {
+        if (gameOver || isPaused) return;
+        if (snake.nextDir === 'up' && snake.dir !== 'down') snake.dir = 'up';
+        else if (snake.nextDir === 'down' && snake.dir !== 'up') snake.dir = 'down';
+        else if (snake.nextDir === 'left' && snake.dir !== 'right') snake.dir = 'left';
+        else if (snake.nextDir === 'right' && snake.dir !== 'left') snake.dir = 'right';
+        const head = snake.body[0]; let newHead = { ...head };
+        if (snake.dir === 'right') newHead.x += 1; if (snake.dir === 'left') newHead.x -= 1;
+        if (snake.dir === 'up') newHead.y -= 1; if (snake.dir === 'down') newHead.y += 1;
+        if (newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS) { gameOver = true; return; }
+        if (snake.body.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { gameOver = true; return; }
+        snake.body.unshift(newHead);
+        if (newHead.x === snake.food.x && newHead.y === snake.food.y) { updateScoreDisplay(score + 1); generateSnakeFood(); }
+        else snake.body.pop();
+      }
+
+      function updateFlappy() {
+        if (flappyGameOver || isPaused) return;
+        flappyBird.vy += FLAPPY_GRAVITY; flappyBird.y += flappyBird.vy;
+        if (flappyBird.y - flappyBird.radius < 0) { flappyBird.y = flappyBird.radius; flappyBird.vy = 0; }
+        if (flappyBird.y + flappyBird.radius > canvas.height) { flappyGameOver = true; return; }
+        for (let i = 0; i < flappyPipes.length; i++) {
+          const pipe = flappyPipes[i]; pipe.x -= FLAPPY_PIPE_SPEED;
+          if (pipe.x + FLAPPY_PIPE_WIDTH < 0) { flappyPipes.splice(i, 1); i--; continue; }
+          if (150 + flappyBird.radius > pipe.x && 150 - flappyBird.radius < pipe.x + FLAPPY_PIPE_WIDTH) {
+            if (flappyBird.y - flappyBird.radius < pipe.top || flappyBird.y + flappyBird.radius > pipe.top + FLAPPY_PIPE_GAP) { flappyGameOver = true; return; }
+          }
+          if (!pipe.passed && pipe.x + FLAPPY_PIPE_WIDTH < 150) { pipe.passed = true; flappyScore++; updateScoreDisplay(flappyScore); }
+        }
+        if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length-1].x < 600) flappyPipes.push({ x: 800, top: 50 + Math.random() * 200, passed: false });
+      }
+
+      function updateAstro() {
+        if (astroGameOver || isPaused) return;
+        if (keys['ArrowLeft'] && astroPlayer.x > 10) astroPlayer.x -= ASTRO_SPEED;
+        if (keys['ArrowRight'] && astroPlayer.x < canvas.width - astroPlayer.width - 10) astroPlayer.x += ASTRO_SPEED;
+        astroSpawnTimer++;
+        if (astroSpawnTimer % 28 === 0) astroObstacles.push({ x: Math.random() * (canvas.width - ASTRO_OBS_WIDTH), y: -ASTRO_OBS_HEIGHT, w: ASTRO_OBS_WIDTH, h: ASTRO_OBS_HEIGHT });
+        for (let i = astroObstacles.length-1; i >= 0; i--) {
+          const obs = astroObstacles[i]; obs.y += 3.5;
+          if (obs.x < astroPlayer.x + astroPlayer.width && obs.x + obs.w > astroPlayer.x && obs.y < astroPlayer.y + astroPlayer.height && obs.y + obs.h > astroPlayer.y) { astroGameOver = true; return; }
+          if (obs.y > canvas.height) { astroObstacles.splice(i, 1); astroScore++; updateScoreDisplay(astroScore); }
+        }
+      }
+
+      function updateSapper() {
+        if (sapperGameOver || sapperWin || isPaused) return;
+        let revealedCount = 0; let totalSafe = SAPPER_ROWS * SAPPER_COLS - SAPPER_MINES;
+        for (let r = 0; r < SAPPER_ROWS; r++) for (let c = 0; c < SAPPER_COLS; c++)
+          if (sapperRevealed[r][c] && sapperGrid[r][c] !== -1) revealedCount++;
+        if (revealedCount === totalSafe) sapperWin = true;
+      }
+
+      function gameLoop(timestamp) {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        lastTimestamp = timestamp;
+        clearCanvas();
+        if (currentGame === 'snake') drawSnake();
+        else if (currentGame === 'sapper') drawSapper();
+        else if (currentGame === 'flappy') drawFlappy();
+        else if (currentGame === 'astro') drawAstro();
+        animationFrame = requestAnimationFrame(gameLoop);
+      }
+
+      function startRenderLoop() {
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        lastTimestamp = 0;
+        animationFrame = requestAnimationFrame(gameLoop);
+      }
+
+      function startLogicInterval() {
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => {
+          if (isPaused) return;
+          if (currentGame === 'snake') updateSnake();
+          else if (currentGame === 'flappy') updateFlappy();
+          else if (currentGame === 'astro') updateAstro();
+          else if (currentGame === 'sapper') updateSapper();
+        }, 60);
+      }
+
+      function switchGame(game) {
+        stopCurrentGame();
+        currentGame = game;
+        const titles = { snake: 'ЗМЕЙКА', sapper: 'САПЁР', flappy: 'FLAPPY BIRD', astro: 'КОСМО-ДОДЖ' };
+        modalGameTitle.textContent = titles[game];
+        if (game === 'snake') initSnake();
+        else if (game === 'sapper') initSapper();
+        else if (game === 'flappy') initFlappy();
+        else if (game === 'astro') initAstro();
+        startRenderLoop();
+        startLogicInterval();
+        isPaused = false;
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+      }
+
+      window.addEventListener('keydown', (e) => {
+        keys[e.key] = true;
+        if (currentGame === 'snake') {
+          if (e.key === 'ArrowUp') { e.preventDefault(); snake.nextDir = 'up'; }
+          if (e.key === 'ArrowDown') { e.preventDefault(); snake.nextDir = 'down'; }
+          if (e.key === 'ArrowLeft') { e.preventDefault(); snake.nextDir = 'left'; }
+          if (e.key === 'ArrowRight') { e.preventDefault(); snake.nextDir = 'right'; }
+        }
+        if (currentGame === 'flappy' && (e.key === ' ' || e.key === 'Space')) {
+          e.preventDefault();
+          if (!flappyGameOver && !isPaused) flappyBird.vy = FLAPPY_JUMP;
+        }
+        if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
+          e.preventDefault(); restartCurrentGame();
+        }
+      });
+
+      window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+      canvas.addEventListener('click', (e) => {
+        if (currentGame === 'flappy') {
+          if (!flappyGameOver && !isPaused) flappyBird.vy = FLAPPY_JUMP;
+        } else if (currentGame === 'sapper') {
+          if (sapperGameOver || sapperWin || isPaused) return;
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width; const scaleY = canvas.height / rect.height;
+          const mouseX = (e.clientX - rect.left) * scaleX; const mouseY = (e.clientY - rect.top) * scaleY;
+          const cellW = canvas.width / SAPPER_COLS; const cellH = canvas.height / SAPPER_ROWS;
+          const c = Math.floor(mouseX / cellW); const r = Math.floor(mouseY / cellH);
+          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
+            if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
+            if (sapperGrid[r][c] === -1) { sapperGameOver = true; sapperRevealed[r][c] = true; }
+            else { revealSapperCell(r, c); updateSapper(); }
+          }
+        }
+      });
+
+      canvas.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        if (currentGame === 'sapper') {
+          if (sapperGameOver || sapperWin || isPaused) return;
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width; const scaleY = canvas.height / rect.height;
+          const mouseX = (e.clientX - rect.left) * scaleX; const mouseY = (e.clientY - rect.top) * scaleY;
+          const cellW = canvas.width / SAPPER_COLS; const cellH = canvas.height / SAPPER_ROWS;
+          const c = Math.floor(mouseX / cellW); const r = Math.floor(mouseY / cellH);
+          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
+            if (sapperRevealed[r][c]) return;
+            sapperFlags[r][c] = !sapperFlags[r][c];
+          }
+        }
+      });
+
+      function revealSapperCell(r, c) {
+        if (r < 0 || r >= SAPPER_ROWS || c < 0 || c >= SAPPER_COLS) return;
+        if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
+        if (sapperGrid[r][c] === -1) { sapperGameOver = true; sapperRevealed[r][c] = true; return; }
+        sapperRevealed[r][c] = true;
+        if (sapperGrid[r][c] === 0) for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+          revealSapperCell(r + dr, c + dc);
+        }
+      }
+
+      document.getElementById('restartBtn').addEventListener('click', restartCurrentGame);
+      document.getElementById('pauseBtn').addEventListener('click', () => {
+        if (gameOver && currentGame !== 'sapper') return;
+        if (currentGame === 'sapper' && (sapperGameOver || sapperWin)) return;
+        isPaused = !isPaused;
+        document.getElementById('pauseBtn').textContent = isPaused ? '▶ Продолжить' : '⏸ Пауза';
+      });
+
+      function restartCurrentGame() {
+        if (currentGame === 'snake') initSnake();
+        else if (currentGame === 'sapper') initSapper();
+        else if (currentGame === 'flappy') initFlappy();
+        else if (currentGame === 'astro') initAstro();
+        isPaused = false; gameOver = false;
+        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+      }
+
+      document.querySelectorAll('.game-card').forEach(card => {
+        card.addEventListener('click', () => {
+          modal.classList.add('active');
+          switchGame(card.dataset.game);
+        });
+      });
+
+      document.getElementById('closeModal').addEventListener('click', () => {
+        modal.classList.remove('active');
+        stopAllIntervals();
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          stopAllIntervals();
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
