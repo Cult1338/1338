@@ -9,8 +9,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&family=Lobster&family=Press+Start+2P&family=Caveat:wght@700&family=Bebas+Neue&family=Great+Vibes&family=Russo+One&family=Pacifico&family=Marck+Script&family=Bad+Script&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
     :root {
       --bg-primary:     #04070d;
@@ -591,9 +590,6 @@
 </head>
 <body>
 
-  <!-- ============================================================
-       SVG-ИКОНКИ РАНГОВ DOTA 2
-       ============================================================ -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
       <symbol id="rank-herald" viewBox="0 0 64 64">
@@ -696,7 +692,6 @@
     </defs>
   </svg>
 
-  <!-- Основной SVG для градиентов и фильтров ледяного текста -->
   <svg width="0" height="0" style="position:absolute; pointer-events:none" aria-hidden="true">
     <defs>
       <linearGradient id="iceGrad" x1="0" y1="0" x2="0" y2="1">
@@ -938,31 +933,21 @@
         <ellipse cx="660" cy="151" rx="2.2" ry="3.2"/>
       </g>
 
-      <text x="450" y="245" text-anchor="middle"
-            font-family="'Playfair Display', serif" font-style="italic"
+      <text id="games-glow" x="450" y="245" text-anchor="middle"
+            class="games-word" font-style="italic"
             font-size="96"
             fill="#4fb0e8" opacity="0.3"
-            filter="url(#iceGlow)">игры</text>
-      <text x="450" y="240" text-anchor="middle"
-            font-family="'Playfair Display', serif" font-style="italic"
+            filter="url(#iceGlow)"></text>
+      <text id="games-3d" x="450" y="240" text-anchor="middle"
+            class="games-word" font-style="italic"
             font-size="96"
-            fill="#0a2a4a" filter="url(#ice3D)">игры</text>
-      <text x="450" y="240" text-anchor="middle"
-            font-family="'Playfair Display', serif" font-style="italic"
-            font-size="96"
-            fill="#0a2a4a" filter="url(#iceCrust)">игры</text>
-      <text x="450" y="235" text-anchor="middle"
-            font-family="'Playfair Display', serif" font-style="italic"
+            fill="#0a2a4a" filter="url(#ice3D)"></text>
+      <text id="games-main" x="450" y="235" text-anchor="middle"
+            class="games-word" font-style="italic"
             font-size="96"
             fill="url(#iceGrad)"
             stroke="#1a4d7a" stroke-width="0.8"
-            filter="url(#frostTop)">игры</text>
-      <text x="450" y="235" text-anchor="middle"
-            font-family="'Playfair Display', serif" font-style="italic"
-            font-size="96"
-            fill="none"
-            stroke="rgba(255,255,255,0.5)" stroke-width="0.8"
-            stroke-dasharray="3 300">игры</text>
+            filter="url(#frostTop)"></text>
 
       <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
         <path d="M 340,255 q 2,6 0,14 q 4,-6 5,-14 z"/>
@@ -1189,6 +1174,89 @@
       setTimeout(tick, 300);
     })();
 
+    // ============================================================
+    // ПЕЧАТНАЯ МАШИНКА ДЛЯ СЛОВА «ИГРЫ» + СМЕНА ШРИФТА
+    // ============================================================
+    (function gamesTypewriter() {
+      var FONTS = [
+        "'Playfair Display', serif",
+        "'Lobster', cursive",
+        "'Press Start 2P', monospace",
+        "'Caveat', cursive",
+        "'Bebas Neue', sans-serif",
+        "'Great Vibes', cursive",
+        "'Russo One', sans-serif",
+        "'Pacifico', cursive",
+        "'Marck Script', cursive",
+        "'Bad Script', cursive"
+      ];
+
+      var nodes = [
+        document.getElementById('games-glow'),
+        document.getElementById('games-3d'),
+        document.getElementById('games-main')
+      ].filter(Boolean);
+
+      if (nodes.length === 0) {
+        console.log('gamesTypewriter: элементы «игры» не найдены');
+        return;
+      }
+
+      var FULL_WORD = 'игры';
+
+      var TYPE_DELAY   = 180;
+      var DELETE_DELAY = 120;
+      var HOLD_FULL    = 1800;
+      var HOLD_EMPTY   = 300;
+
+      var index = 0;
+      var fontIndex = Math.floor(Math.random() * FONTS.length);
+      var phase = 'typing';
+
+      function setText(s) {
+        nodes.forEach(function(n) { n.textContent = s; });
+      }
+
+      function applyFont(font) {
+        nodes.forEach(function(n) { n.setAttribute('font-family', font); });
+      }
+
+      applyFont(FONTS[fontIndex]);
+      setText('');
+
+      function tick() {
+        if (phase === 'typing') {
+          if (index < FULL_WORD.length) {
+            index++;
+            setText(FULL_WORD.slice(0, index));
+            setTimeout(tick, TYPE_DELAY);
+          } else {
+            phase = 'holdFull';
+            setTimeout(tick, HOLD_FULL);
+          }
+        } else if (phase === 'holdFull') {
+          phase = 'deleting';
+          tick();
+        } else if (phase === 'deleting') {
+          if (index > 0) {
+            index--;
+            setText(FULL_WORD.slice(0, index));
+            setTimeout(tick, DELETE_DELAY);
+          } else {
+            fontIndex = (fontIndex + 1) % FONTS.length;
+            applyFont(FONTS[fontIndex]);
+            phase = 'holdEmpty';
+            setTimeout(tick, HOLD_EMPTY);
+          }
+        } else if (phase === 'holdEmpty') {
+          phase = 'typing';
+          tick();
+        }
+      }
+
+      setTimeout(tick, 800);
+    })();
+
     var BestScores = {
       cache: { snake: 0, sapper: 0, flappy: 0, astro: 0, pudge: 0 },
       loaded: false,
@@ -1349,7 +1417,7 @@
     })();
 
     // ============================================================
-    // ИГРОВОЙ ДВИЖОК + PUDGE HOOK (ранги Dota 2)
+    // ИГРОВОЙ ДВИЖОК + PUDGE HOOK
     // ============================================================
     (function() {
       var canvas = document.getElementById('gameCanvas');
@@ -1371,18 +1439,15 @@
       var LOGIC_STEP = 1 / 60;
       var MAX_FRAME = 0.1;
 
-      // Snake
       var snake = { body: [], dir: 'right', nextDir: 'right', food: {x:10,y:10} };
       var COLS = 40, ROWS = 20, CELL = 20;
       var SNAKE_SPEED = 8;
       var snakeTimer = 0;
 
-      // Sapper
       var sapperGrid = [], sapperRevealed = [], sapperFlags = [];
       var sapperGameOver = false, sapperWin = false;
       var SAPPER_COLS = 16, SAPPER_ROWS = 8, SAPPER_MINES = 12;
 
-      // Flappy
       var flappyBird = { y: 200, vy: 0, radius: 15 };
       var flappyPipes = [], flappyScore = 0, flappyGameOver = false;
       var FLAPPY_GRAVITY = 25;
@@ -1391,7 +1456,6 @@
       var FLAPPY_PIPE_GAP = 130;
       var FLAPPY_PIPE_SPEED = 3.0;
 
-      // Astro
       var astroPlayer = { x: 385, y: 350, width: 30, height: 30 };
       var astroObstacles = [], astroScore = 0, astroGameOver = false;
       var ASTRO_SPEED = 6;
@@ -1401,7 +1465,6 @@
       var ASTRO_OBS_WIDTH = 35;
       var ASTRO_OBS_HEIGHT = 35;
 
-      // Pudge
       var pudge = { x: 80, y: 340, radius: 22 };
       var hook = {
         x: 80, y: 340, originX: 80, originY: 340,
@@ -1417,7 +1480,6 @@
       var pudgeSpawnTimer = 0;
       var pudgeSpawnEvery = 1.4;
 
-      // Ранги Dota 2 — генерируем PNG из SVG
       var DOTA_RANKS = [
         { key: 'herald',   svgId: 'rank-herald',   img: null },
         { key: 'guardian', svgId: 'rank-guardian', img: null },
@@ -1728,7 +1790,6 @@
         ctx.restore();
       }
 
-      // ---- ОСТАЛЬНЫЕ ИГРЫ ----
       function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
       function updateScoreDisplay(val) { score = val; scoreDisplay.textContent = val; }
 
