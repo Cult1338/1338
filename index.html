@@ -71,7 +71,6 @@
       padding-bottom: var(--tg-safe-bottom);
     }
 
-    /* ---------- ФОН ---------- */
     .bg-forest {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -159,7 +158,7 @@
     }
 
     /* ============================================================
-       ШАПКА CULT1338 — ледяной неон + подтёки
+       ШАПКА с SVG
        ============================================================ */
     header {
       position: fixed;
@@ -171,7 +170,7 @@
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid var(--border-color);
       border-radius: 50px;
-      padding: 12px 22px 16px;
+      padding: 6px 14px;
       width: 92%;
       max-width: 800px;
       display: flex;
@@ -185,83 +184,25 @@
 
     body.tg-webapp header { top: calc(15px + var(--tg-safe-top)); }
 
-    body.theme-light header {
-      box-shadow: 0 10px 30px rgba(60, 120, 180, 0.15);
+    .header-wrap {
+      width: 100%;
+      max-width: 460px;
+      aspect-ratio: 460 / 90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .header-text {
-      font-family: 'Inter', sans-serif;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: 8px;
-      text-transform: uppercase;
-      position: relative;
-      display: inline-block;
-      margin: 0;
-      line-height: 1.2;
-      min-height: 34px;
-      padding-bottom: 4px;
-      white-space: nowrap;
-
-      background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #d6f0ff 30%,
-        #7fd4ff 65%,
-        #3a9fd8 100%
-      );
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-
-      text-shadow:
-        0 0 4px rgba(190, 240, 255, 0.9),
-        0 0 12px rgba(120, 200, 255, 0.75),
-        0 0 28px rgba(80, 170, 240, 0.6),
-        0 0 50px rgba(50, 140, 220, 0.35);
+    .header-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 12px rgba(120, 200, 255, 0.55));
     }
 
-    /* Ледяные подтёки под буквами */
-    .header-text::before {
-      content: '';
-      position: absolute;
-      left: -6px;
-      right: -6px;
-      bottom: -6px;
-      height: 14px;
-      background:
-        radial-gradient(ellipse 3px 10px at 8%  0%, rgba(190,240,255,0.85), transparent 70%),
-        radial-gradient(ellipse 2px 6px  at 18% 0%, rgba(190,240,255,0.75), transparent 70%),
-        radial-gradient(ellipse 4px 14px at 32% 0%, rgba(190,240,255,0.9),  transparent 70%),
-        radial-gradient(ellipse 2px 8px  at 44% 0%, rgba(190,240,255,0.7),  transparent 70%),
-        radial-gradient(ellipse 3px 12px at 56% 0%, rgba(190,240,255,0.85), transparent 70%),
-        radial-gradient(ellipse 2px 7px  at 68% 0%, rgba(190,240,255,0.7),  transparent 70%),
-        radial-gradient(ellipse 4px 13px at 82% 0%, rgba(190,240,255,0.9),  transparent 70%),
-        radial-gradient(ellipse 2px 9px  at 92% 0%, rgba(190,240,255,0.75), transparent 70%);
-      filter: blur(0.5px);
-      opacity: 0.9;
-      pointer-events: none;
-      animation: icicle-shimmer 3s ease-in-out infinite alternate;
-    }
-
-    .header-text::after {
-      content: '|';
-      color: #d6f0ff;
-      font-weight: 300;
-      margin-left: 4px;
-      text-shadow: 0 0 8px rgba(190,240,255,0.9), 0 0 20px rgba(120,200,255,0.6);
-      animation: blink 1s step-end infinite;
-      opacity: 0.9;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 0.9; }
-      50% { opacity: 0; }
-    }
-
-    @keyframes icicle-shimmer {
-      0%   { opacity: 0.75; transform: translateY(0); }
-      100% { opacity: 1;    transform: translateY(1px); }
+    @media (max-width: 600px) {
+      header { padding: 4px 10px; width: 94%; }
+      .header-wrap { max-width: 340px; }
     }
 
     /* ---------- ГЛАВНЫЙ ЭКРАН ---------- */
@@ -281,76 +222,14 @@
       padding-top: calc(100px + var(--tg-safe-top));
     }
 
-    .hero h1 {
-      font-size: clamp(32px, 9vw, 80px);
-      font-weight: 900;
-      line-height: 1.05;
-      letter-spacing: -1px;
-      text-transform: uppercase;
+    .hero-svg {
+      width: 100%;
       max-width: 900px;
-      position: relative;
-    }
-
-    .hero h1 .italic-red {
+      height: auto;
       display: block;
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-weight: 400;
-      text-transform: none;
-      font-size: clamp(30px, 8vw, 70px);
-      margin-top: -8px;
-
-      background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #d6f0ff 40%,
-        #7fd4ff 100%
-      );
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow:
-        0 0 8px rgba(190, 240, 255, 0.7),
-        0 0 30px rgba(120, 200, 255, 0.5);
-    }
-
-    /* Ледяной градиент + подтёки для всех крупных заголовков */
-    .hero h1,
-    .section-title {
-      position: relative;
-      background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        #e6f6ff 35%,
-        #9fdcff 70%,
-        #4aa8e0 100%
-      );
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow:
-        0 0 6px rgba(190, 240, 255, 0.35),
-        0 0 22px rgba(120, 200, 255, 0.25);
-    }
-
-    .hero h1::after {
-      content: '';
-      position: absolute;
-      left: 10%;
-      right: 10%;
-      bottom: -10px;
-      height: 20px;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 4px 12px at 6%  0%, rgba(190,240,255,0.85), transparent 70%),
-        radial-gradient(ellipse 3px 8px  at 18% 0%, rgba(190,240,255,0.7),  transparent 70%),
-        radial-gradient(ellipse 5px 16px at 34% 0%, rgba(190,240,255,0.9),  transparent 70%),
-        radial-gradient(ellipse 3px 10px at 52% 0%, rgba(190,240,255,0.75), transparent 70%),
-        radial-gradient(ellipse 4px 14px at 68% 0%, rgba(190,240,255,0.85), transparent 70%),
-        radial-gradient(ellipse 3px 9px  at 84% 0%, rgba(190,240,255,0.75), transparent 70%),
-        radial-gradient(ellipse 5px 15px at 94% 0%, rgba(190,240,255,0.9),  transparent 70%);
-      filter: blur(0.6px);
-      animation: icicle-shimmer 4s ease-in-out infinite alternate;
+      margin: 0 auto;
+      filter: drop-shadow(0 0 20px rgba(120, 200, 255, 0.45))
+              drop-shadow(0 0 50px rgba(80, 170, 240, 0.25));
     }
 
     .hero-buttons {
@@ -408,44 +287,14 @@
       z-index: 2;
     }
 
-    .section-title {
-      font-size: clamp(28px, 6vw, 52px);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 45px;
-    }
-
-    .section-title::before {
-      content: '';
+    .section-svg {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
       display: block;
-      width: 5px;
-      height: 42px;
-      background: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-      flex-shrink: 0;
-    }
-
-    .section-title::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -8px;
-      height: 16px;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 3px 9px  at 8%  0%, rgba(190,240,255,0.8),  transparent 70%),
-        radial-gradient(ellipse 4px 12px at 22% 0%, rgba(190,240,255,0.85), transparent 70%),
-        radial-gradient(ellipse 3px 8px  at 38% 0%, rgba(190,240,255,0.75), transparent 70%),
-        radial-gradient(ellipse 4px 11px at 58% 0%, rgba(190,240,255,0.85), transparent 70%),
-        radial-gradient(ellipse 3px 7px  at 74% 0%, rgba(190,240,255,0.7),  transparent 70%),
-        radial-gradient(ellipse 4px 13px at 90% 0%, rgba(190,240,255,0.9),  transparent 70%);
-      filter: blur(0.5px);
-      animation: icicle-shimmer 5s ease-in-out infinite alternate;
+      margin-bottom: 45px;
+      filter: drop-shadow(0 0 14px rgba(120, 200, 255, 0.4))
+              drop-shadow(0 0 30px rgba(80, 170, 240, 0.2));
     }
 
     .games-grid {
@@ -720,14 +569,13 @@
     }
 
     @media (max-width: 600px) {
-      header { padding: 10px 16px 14px; width: 94%; }
-      .header-text { font-size: 18px; letter-spacing: 4px; }
       .hero { padding: 90px 16px 40px; }
       .games-section { padding: 60px 16px 100px; }
       .modal-body { padding: 10px; }
       .modal-header { padding: 12px 16px; }
       .modal-header h2 { font-size: 14px; }
       .ctrl-btn { padding: 8px 14px; font-size: 10px; }
+      .hero-svg { max-width: 100%; }
     }
 
     #errorBox {
@@ -748,20 +596,256 @@
 </head>
 <body>
 
+  <!-- SVG defs: градиенты и фильтры для ледяного текста -->
+  <svg width="0" height="0" style="position:absolute; pointer-events:none" aria-hidden="true">
+    <defs>
+      <linearGradient id="iceGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#ffffff"/>
+        <stop offset="18%"  stop-color="#eaf9ff"/>
+        <stop offset="45%"  stop-color="#a8e0ff"/>
+        <stop offset="72%"  stop-color="#4fb0e8"/>
+        <stop offset="100%" stop-color="#1d5f96"/>
+      </linearGradient>
+
+      <linearGradient id="icicleGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#eaf9ff"/>
+        <stop offset="60%"  stop-color="#a0dcff"/>
+        <stop offset="100%" stop-color="#5fb8e8" stop-opacity="0.3"/>
+      </linearGradient>
+
+      <filter id="iceGlow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <filter id="ice3D" x="-20%" y="-20%" width="140%" height="160%">
+        <feOffset in="SourceAlpha" dx="0" dy="1" result="o1"/>
+        <feOffset in="SourceAlpha" dx="0" dy="2" result="o2"/>
+        <feOffset in="SourceAlpha" dx="0" dy="3" result="o3"/>
+        <feOffset in="SourceAlpha" dx="0" dy="4" result="o4"/>
+        <feOffset in="SourceAlpha" dx="0" dy="5" result="o5"/>
+        <feOffset in="SourceAlpha" dx="0" dy="6" result="o6"/>
+        <feOffset in="SourceAlpha" dx="0" dy="7" result="o7"/>
+        <feOffset in="SourceAlpha" dx="0" dy="8" result="o8"/>
+        <feMerge>
+          <feMergeNode in="o8"/>
+          <feMergeNode in="o7"/>
+          <feMergeNode in="o6"/>
+          <feMergeNode in="o5"/>
+          <feMergeNode in="o4"/>
+          <feMergeNode in="o3"/>
+          <feMergeNode in="o2"/>
+          <feMergeNode in="o1"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <filter id="icicleSoft">
+        <feGaussianBlur stdDeviation="0.3"/>
+      </filter>
+
+      <!-- НАРАЩИВАНИЕ ЛЬДА ПО КОНТУРУ БУКВ -->
+      <filter id="iceCrust" x="-15%" y="-15%" width="130%" height="140%">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="dilate1"/>
+        <feMorphology in="SourceAlpha" operator="dilate" radius="1.2" result="dilate2"/>
+        <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="dilate3"/>
+
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
+        <feDisplacementMap in="dilate1" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="wobble1"/>
+        <feDisplacementMap in="dilate2" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="wobble2"/>
+        <feDisplacementMap in="dilate3" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="wobble3"/>
+
+        <feFlood flood-color="#1a4d7a" result="c1"/>
+        <feComposite in="c1" in2="wobble1" operator="in" result="ring1"/>
+
+        <feFlood flood-color="#4fb0e8" result="c2"/>
+        <feComposite in="c2" in2="wobble2" operator="in" result="ring2"/>
+
+        <feFlood flood-color="#a8e0ff" result="c3"/>
+        <feComposite in="c3" in2="wobble3" operator="in" result="ring3"/>
+
+        <feMerge>
+          <feMergeNode in="ring1"/>
+          <feMergeNode in="ring2"/>
+          <feMergeNode in="ring3"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <!-- ВЕРХНИЙ СНЕГ -->
+      <filter id="frostTop" x="-15%" y="-25%" width="130%" height="150%">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="top"/>
+        <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="13" result="noise"/>
+        <feDisplacementMap in="top" in2="noise" scale="4.5" xChannelSelector="R" yChannelSelector="G" result="wobble"/>
+        <feFlood flood-color="#ffffff" result="white"/>
+        <feComposite in="white" in2="wobble" operator="in" result="snow"/>
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="snow"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
   <div class="bg-forest"></div>
   <div class="bg-overlay"></div>
   <canvas id="snowCanvas"></canvas>
   <div class="glow-top"></div>
 
+  <!-- ШАПКА -->
   <header>
-    <div class="header-text" id="typewriterHeader"></div>
+    <div class="header-wrap">
+      <svg class="header-svg" viewBox="0 0 460 90" preserveAspectRatio="xMidYMid meet">
+        <text x="230" y="60" text-anchor="middle"
+              font-family="Inter, sans-serif" font-weight="900"
+              font-size="52" letter-spacing="6"
+              fill="#4fb0e8" opacity="0.35"
+              filter="url(#iceGlow)">CULT1338</text>
+
+        <text x="230" y="58" text-anchor="middle"
+              font-family="Inter, sans-serif" font-weight="900"
+              font-size="52" letter-spacing="6"
+              fill="#0a2a4a" filter="url(#ice3D)">CULT1338</text>
+
+        <text x="230" y="58" text-anchor="middle"
+              font-family="Inter, sans-serif" font-weight="900"
+              font-size="52" letter-spacing="6"
+              fill="#0a2a4a"
+              filter="url(#iceCrust)">CULT1338</text>
+
+        <text x="230" y="55" text-anchor="middle"
+              font-family="Inter, sans-serif" font-weight="900"
+              font-size="52" letter-spacing="6"
+              fill="url(#iceGrad)"
+              stroke="#1a4d7a" stroke-width="0.6"
+              filter="url(#frostTop)">CULT1338</text>
+
+        <text x="230" y="55" text-anchor="middle"
+              font-family="Inter, sans-serif" font-weight="900"
+              font-size="52" letter-spacing="6"
+              fill="none"
+              stroke="rgba(255,255,255,0.55)" stroke-width="0.6"
+              stroke-dasharray="2 240">CULT1338</text>
+
+        <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
+          <path d="M 60,42 q 1,4 0,10 q 3,-4 4,-10 z"/>
+          <path d="M 90,42 q 1,5 0,12 q 3,-5 4,-12 z"/>
+          <path d="M 130,42 q 1,6 0,14 q 3,-6 5,-14 z"/>
+          <path d="M 175,42 q 1,4 0,9  q 3,-4 4,-9 z"/>
+          <path d="M 220,42 q 1,5 0,11 q 3,-5 4,-11 z"/>
+          <path d="M 265,42 q 1,4 0,10 q 3,-4 4,-10 z"/>
+          <path d="M 310,42 q 1,6 0,13 q 3,-6 5,-13 z"/>
+          <path d="M 350,42 q 1,4 0,9  q 3,-4 4,-9 z"/>
+          <path d="M 395,42 q 1,5 0,11 q 3,-5 4,-11 z"/>
+        </g>
+
+        <g fill="#c8f0ff" opacity="0.95">
+          <ellipse cx="70"  cy="86" rx="2" ry="3"/>
+          <ellipse cx="150" cy="88" rx="1.6" ry="2.4"/>
+          <ellipse cx="245" cy="86" rx="2.2" ry="3.2"/>
+          <ellipse cx="320" cy="88" rx="1.6" ry="2.4"/>
+          <ellipse cx="400" cy="87" rx="2" ry="3"/>
+        </g>
+      </svg>
+    </div>
   </header>
 
+  <!-- HERO -->
   <section class="hero">
-    <h1>
-      НОВЫЙ ВЗГЛЯД НА<br>
-      <span class="italic-red">игры</span>
-    </h1>
+    <svg class="hero-svg" viewBox="0 0 900 320" preserveAspectRatio="xMidYMid meet">
+      <text x="450" y="110" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="86" letter-spacing="-1"
+            fill="#4fb0e8" opacity="0.3"
+            filter="url(#iceGlow)">НОВЫЙ ВЗГЛЯД НА</text>
+
+      <text x="450" y="105" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="86" letter-spacing="-1"
+            fill="#0a2a4a" filter="url(#ice3D)">НОВЫЙ ВЗГЛЯД НА</text>
+
+      <text x="450" y="105" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="86" letter-spacing="-1"
+            fill="#0a2a4a"
+            filter="url(#iceCrust)">НОВЫЙ ВЗГЛЯД НА</text>
+
+      <text x="450" y="100" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="86" letter-spacing="-1"
+            fill="url(#iceGrad)"
+            stroke="#1a4d7a" stroke-width="0.8"
+            filter="url(#frostTop)">НОВЫЙ ВЗГЛЯД НА</text>
+
+      <text x="450" y="100" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="86" letter-spacing="-1"
+            fill="none"
+            stroke="rgba(255,255,255,0.5)" stroke-width="0.8"
+            stroke-dasharray="3 420">НОВЫЙ ВЗГЛЯД НА</text>
+
+      <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
+        <path d="M 160,120 q 2,6 0,16 q 4,-6 6,-16 z"/>
+        <path d="M 220,120 q 2,8 0,20 q 4,-8 6,-20 z"/>
+        <path d="M 300,120 q 2,6 0,14 q 4,-6 5,-14 z"/>
+        <path d="M 380,120 q 2,7 0,18 q 4,-7 6,-18 z"/>
+        <path d="M 460,120 q 2,5 0,13 q 4,-5 5,-13 z"/>
+        <path d="M 540,120 q 2,8 0,19 q 4,-8 6,-19 z"/>
+        <path d="M 630,120 q 2,6 0,15 q 4,-6 5,-15 z"/>
+        <path d="M 720,120 q 2,7 0,17 q 4,-7 6,-17 z"/>
+      </g>
+
+      <g fill="#c8f0ff" opacity="0.95">
+        <ellipse cx="200" cy="150" rx="2.4" ry="3.6"/>
+        <ellipse cx="350" cy="152" rx="2"   ry="3"/>
+        <ellipse cx="500" cy="150" rx="2.6" ry="3.8"/>
+        <ellipse cx="660" cy="151" rx="2.2" ry="3.2"/>
+      </g>
+
+      <text x="450" y="245" text-anchor="middle"
+            font-family="'Playfair Display', serif" font-style="italic"
+            font-size="96"
+            fill="#4fb0e8" opacity="0.3"
+            filter="url(#iceGlow)">игры</text>
+      <text x="450" y="240" text-anchor="middle"
+            font-family="'Playfair Display', serif" font-style="italic"
+            font-size="96"
+            fill="#0a2a4a" filter="url(#ice3D)">игры</text>
+      <text x="450" y="240" text-anchor="middle"
+            font-family="'Playfair Display', serif" font-style="italic"
+            font-size="96"
+            fill="#0a2a4a"
+            filter="url(#iceCrust)">игры</text>
+      <text x="450" y="235" text-anchor="middle"
+            font-family="'Playfair Display', serif" font-style="italic"
+            font-size="96"
+            fill="url(#iceGrad)"
+            stroke="#1a4d7a" stroke-width="0.8"
+            filter="url(#frostTop)">игры</text>
+      <text x="450" y="235" text-anchor="middle"
+            font-family="'Playfair Display', serif" font-style="italic"
+            font-size="96"
+            fill="none"
+            stroke="rgba(255,255,255,0.5)" stroke-width="0.8"
+            stroke-dasharray="3 300">игры</text>
+
+      <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
+        <path d="M 340,255 q 2,6 0,14 q 4,-6 5,-14 z"/>
+        <path d="M 420,255 q 2,8 0,18 q 4,-8 6,-18 z"/>
+        <path d="M 490,255 q 2,7 0,16 q 4,-7 5,-16 z"/>
+        <path d="M 560,255 q 2,9 0,20 q 4,-9 6,-20 z"/>
+      </g>
+
+      <g fill="#c8f0ff" opacity="0.95">
+        <ellipse cx="380" cy="288" rx="2.4" ry="3.6"/>
+        <ellipse cx="460" cy="290" rx="2"   ry="3"/>
+        <ellipse cx="530" cy="289" rx="2.6" ry="3.8"/>
+      </g>
+    </svg>
+
     <div class="hero-buttons">
       <button class="btn-primary" onclick="scrollToGames()">
         ИГРАТЬ В ИГРЫ
@@ -774,10 +858,51 @@
     </div>
   </section>
 
+  <!-- СЕКЦИЯ ИГР -->
   <section class="games-section" id="games">
-    <div class="section-title">ИГРЫ</div>
-    <div class="games-grid">
+    <svg class="section-svg" viewBox="0 0 400 110" preserveAspectRatio="xMinYMid meet">
+      <text x="200" y="65" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="64" letter-spacing="-1"
+            fill="#4fb0e8" opacity="0.3"
+            filter="url(#iceGlow)">ИГРЫ</text>
+      <text x="200" y="60" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="64" letter-spacing="-1"
+            fill="#0a2a4a" filter="url(#ice3D)">ИГРЫ</text>
+      <text x="200" y="60" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="64" letter-spacing="-1"
+            fill="#0a2a4a"
+            filter="url(#iceCrust)">ИГРЫ</text>
+      <text x="200" y="55" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="64" letter-spacing="-1"
+            fill="url(#iceGrad)"
+            stroke="#1a4d7a" stroke-width="0.8"
+            filter="url(#frostTop)">ИГРЫ</text>
+      <text x="200" y="55" text-anchor="middle"
+            font-family="Inter, sans-serif" font-weight="900"
+            font-size="64" letter-spacing="-1"
+            fill="none"
+            stroke="rgba(255,255,255,0.5)" stroke-width="0.8"
+            stroke-dasharray="3 260">ИГРЫ</text>
 
+      <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
+        <path d="M 90,78 q 2,6 0,14 q 4,-6 5,-14 z"/>
+        <path d="M 150,78 q 2,8 0,18 q 4,-8 6,-18 z"/>
+        <path d="M 220,78 q 2,7 0,16 q 4,-7 5,-16 z"/>
+        <path d="M 290,78 q 2,9 0,20 q 4,-9 6,-20 z"/>
+      </g>
+
+      <g fill="#c8f0ff" opacity="0.95">
+        <ellipse cx="120" cy="105" rx="2.4" ry="3.6"/>
+        <ellipse cx="185" cy="107" rx="2"   ry="3"/>
+        <ellipse cx="255" cy="106" rx="2.6" ry="3.8"/>
+      </g>
+    </svg>
+
+    <div class="games-grid">
       <div class="game-card" data-game="snake">
         <div class="best-score" data-best="snake">★ <span>0</span></div>
         <h3>🐍 ЗМЕЙКА</h3>
@@ -801,10 +926,10 @@
         <h3>🚀 КОСМО-ДОДЖ</h3>
         <p>Уклоняйся от астероидов. Стрелки влево/вправо — движение.</p>
       </div>
-
     </div>
   </section>
 
+  <!-- МОДАЛКА -->
   <div class="modal-overlay" id="gameModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -830,9 +955,6 @@
   <div id="errorBox"></div>
 
   <script>
-    // ============================================================
-    // ГЛОБАЛЬНЫЙ ПЕРЕХВАТ ОШИБОК
-    // ============================================================
     window.onerror = function(msg, url, line) {
       var box = document.getElementById('errorBox');
       if (box) {
@@ -1075,39 +1197,7 @@
     })();
 
     // ============================================================
-    // TYPEWRITER
-    // ============================================================
-    (function typewriterEffect() {
-      var el = document.getElementById('typewriterHeader');
-      var fullText = 'CULT1338';
-      var index = 0;
-      var isDeleting = false;
-
-      function tick() {
-        if (!isDeleting) {
-          index++;
-          el.textContent = fullText.slice(0, index);
-          if (index === fullText.length) {
-            setTimeout(function() { isDeleting = true; tick(); }, 10000);
-            return;
-          }
-          setTimeout(tick, 180);
-        } else {
-          index--;
-          el.textContent = fullText.slice(0, index);
-          if (index === 0) {
-            isDeleting = false;
-            setTimeout(tick, 500);
-            return;
-          }
-          setTimeout(tick, 80);
-        }
-      }
-      setTimeout(tick, 300);
-    })();
-
-    // ============================================================
-    // ИГРОВОЙ ДВИЖОК (delta-time, без FPS-кап)
+    // ИГРОВОЙ ДВИЖОК (delta-time)
     // ============================================================
     (function() {
       var canvas = document.getElementById('gameCanvas');
@@ -1129,18 +1219,15 @@
       var LOGIC_STEP = 1 / 60;
       var MAX_FRAME = 0.1;
 
-      // Snake
       var snake = { body: [], dir: 'right', nextDir: 'right', food: {x:10,y:10} };
       var COLS = 40, ROWS = 20, CELL = 20;
       var SNAKE_SPEED = 8;
       var snakeTimer = 0;
 
-      // Sapper
       var sapperGrid = [], sapperRevealed = [], sapperFlags = [];
       var sapperGameOver = false, sapperWin = false;
       var SAPPER_COLS = 16, SAPPER_ROWS = 8, SAPPER_MINES = 12;
 
-      // Flappy
       var flappyBird = { y: 200, vy: 0, radius: 15 };
       var flappyPipes = [], flappyScore = 0, flappyGameOver = false;
       var FLAPPY_GRAVITY = 25;
@@ -1149,7 +1236,6 @@
       var FLAPPY_PIPE_GAP = 130;
       var FLAPPY_PIPE_SPEED = 3.0;
 
-      // Astro
       var astroPlayer = { x: 385, y: 350, width: 30, height: 30 };
       var astroObstacles = [], astroScore = 0, astroGameOver = false;
       var ASTRO_SPEED = 6;
