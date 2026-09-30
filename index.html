@@ -71,6 +71,7 @@
       padding-bottom: var(--tg-safe-bottom);
     }
 
+    /* ---------- ФОН ---------- */
     .bg-forest {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -157,6 +158,9 @@
       opacity: 0.4;
     }
 
+    /* ============================================================
+       ШАПКА CULT1338 — ледяной неон + подтёки
+       ============================================================ */
     header {
       position: fixed;
       top: 15px;
@@ -167,7 +171,7 @@
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid var(--border-color);
       border-radius: 50px;
-      padding: 10px 18px;
+      padding: 12px 22px 16px;
       width: 92%;
       max-width: 800px;
       display: flex;
@@ -176,6 +180,7 @@
       z-index: 100;
       box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px var(--accent-glow);
       transition: top 0.3s;
+      overflow: hidden;
     }
 
     body.tg-webapp header { top: calc(15px + var(--tg-safe-top)); }
@@ -186,35 +191,80 @@
 
     .header-text {
       font-family: 'Inter', sans-serif;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 900;
-      letter-spacing: 7px;
+      letter-spacing: 8px;
       text-transform: uppercase;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 60%, var(--accent) 100%);
+      position: relative;
+      display: inline-block;
+      margin: 0;
+      line-height: 1.2;
+      min-height: 34px;
+      padding-bottom: 4px;
+      white-space: nowrap;
+
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #d6f0ff 30%,
+        #7fd4ff 65%,
+        #3a9fd8 100%
+      );
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 30px var(--accent-glow);
-      margin: 0;
-      line-height: 1;
-      white-space: nowrap;
-      min-height: 30px;
+
+      text-shadow:
+        0 0 4px rgba(190, 240, 255, 0.9),
+        0 0 12px rgba(120, 200, 255, 0.75),
+        0 0 28px rgba(80, 170, 240, 0.6),
+        0 0 50px rgba(50, 140, 220, 0.35);
+    }
+
+    /* Ледяные подтёки под буквами */
+    .header-text::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      height: 14px;
+      background:
+        radial-gradient(ellipse 3px 10px at 8%  0%, rgba(190,240,255,0.85), transparent 70%),
+        radial-gradient(ellipse 2px 6px  at 18% 0%, rgba(190,240,255,0.75), transparent 70%),
+        radial-gradient(ellipse 4px 14px at 32% 0%, rgba(190,240,255,0.9),  transparent 70%),
+        radial-gradient(ellipse 2px 8px  at 44% 0%, rgba(190,240,255,0.7),  transparent 70%),
+        radial-gradient(ellipse 3px 12px at 56% 0%, rgba(190,240,255,0.85), transparent 70%),
+        radial-gradient(ellipse 2px 7px  at 68% 0%, rgba(190,240,255,0.7),  transparent 70%),
+        radial-gradient(ellipse 4px 13px at 82% 0%, rgba(190,240,255,0.9),  transparent 70%),
+        radial-gradient(ellipse 2px 9px  at 92% 0%, rgba(190,240,255,0.75), transparent 70%);
+      filter: blur(0.5px);
+      opacity: 0.9;
+      pointer-events: none;
+      animation: icicle-shimmer 3s ease-in-out infinite alternate;
     }
 
     .header-text::after {
       content: '|';
-      color: var(--accent);
+      color: #d6f0ff;
       font-weight: 300;
-      margin-left: 3px;
+      margin-left: 4px;
+      text-shadow: 0 0 8px rgba(190,240,255,0.9), 0 0 20px rgba(120,200,255,0.6);
       animation: blink 1s step-end infinite;
-      opacity: 0.8;
+      opacity: 0.9;
     }
 
     @keyframes blink {
-      0%, 100% { opacity: 0.8; }
+      0%, 100% { opacity: 0.9; }
       50% { opacity: 0; }
     }
 
+    @keyframes icicle-shimmer {
+      0%   { opacity: 0.75; transform: translateY(0); }
+      100% { opacity: 1;    transform: translateY(1px); }
+    }
+
+    /* ---------- ГЛАВНЫЙ ЭКРАН ---------- */
     .hero {
       min-height: var(--tg-viewport-height);
       display: flex;
@@ -238,12 +288,7 @@
       letter-spacing: -1px;
       text-transform: uppercase;
       max-width: 900px;
-      color: var(--text-primary);
-      text-shadow: 0 4px 30px rgba(0,0,0,0.5);
-    }
-
-    body.theme-light .hero h1 {
-      text-shadow: 0 4px 20px rgba(60, 120, 180, 0.15);
+      position: relative;
     }
 
     .hero h1 .italic-red {
@@ -251,11 +296,61 @@
       font-family: 'Playfair Display', serif;
       font-style: italic;
       font-weight: 400;
-      color: var(--accent);
       text-transform: none;
       font-size: clamp(30px, 8vw, 70px);
       margin-top: -8px;
-      text-shadow: 0 0 40px var(--accent-glow);
+
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #d6f0ff 40%,
+        #7fd4ff 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow:
+        0 0 8px rgba(190, 240, 255, 0.7),
+        0 0 30px rgba(120, 200, 255, 0.5);
+    }
+
+    /* Ледяной градиент + подтёки для всех крупных заголовков */
+    .hero h1,
+    .section-title {
+      position: relative;
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #e6f6ff 35%,
+        #9fdcff 70%,
+        #4aa8e0 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow:
+        0 0 6px rgba(190, 240, 255, 0.35),
+        0 0 22px rgba(120, 200, 255, 0.25);
+    }
+
+    .hero h1::after {
+      content: '';
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      bottom: -10px;
+      height: 20px;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 4px 12px at 6%  0%, rgba(190,240,255,0.85), transparent 70%),
+        radial-gradient(ellipse 3px 8px  at 18% 0%, rgba(190,240,255,0.7),  transparent 70%),
+        radial-gradient(ellipse 5px 16px at 34% 0%, rgba(190,240,255,0.9),  transparent 70%),
+        radial-gradient(ellipse 3px 10px at 52% 0%, rgba(190,240,255,0.75), transparent 70%),
+        radial-gradient(ellipse 4px 14px at 68% 0%, rgba(190,240,255,0.85), transparent 70%),
+        radial-gradient(ellipse 3px 9px  at 84% 0%, rgba(190,240,255,0.75), transparent 70%),
+        radial-gradient(ellipse 5px 15px at 94% 0%, rgba(190,240,255,0.9),  transparent 70%);
+      filter: blur(0.6px);
+      animation: icicle-shimmer 4s ease-in-out infinite alternate;
     }
 
     .hero-buttons {
@@ -304,6 +399,7 @@
       60% { transform: translateY(-5px); }
     }
 
+    /* ---------- СЕКЦИЯ ИГР ---------- */
     .games-section {
       padding: 80px 20px 120px;
       max-width: 1200px;
@@ -321,8 +417,6 @@
       align-items: center;
       gap: 18px;
       margin-bottom: 45px;
-      color: var(--text-primary);
-      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
     .section-title::before {
@@ -332,6 +426,26 @@
       height: 42px;
       background: var(--accent);
       box-shadow: 0 0 20px var(--accent-glow);
+      flex-shrink: 0;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 16px;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 3px 9px  at 8%  0%, rgba(190,240,255,0.8),  transparent 70%),
+        radial-gradient(ellipse 4px 12px at 22% 0%, rgba(190,240,255,0.85), transparent 70%),
+        radial-gradient(ellipse 3px 8px  at 38% 0%, rgba(190,240,255,0.75), transparent 70%),
+        radial-gradient(ellipse 4px 11px at 58% 0%, rgba(190,240,255,0.85), transparent 70%),
+        radial-gradient(ellipse 3px 7px  at 74% 0%, rgba(190,240,255,0.7),  transparent 70%),
+        radial-gradient(ellipse 4px 13px at 90% 0%, rgba(190,240,255,0.9),  transparent 70%);
+      filter: blur(0.5px);
+      animation: icicle-shimmer 5s ease-in-out infinite alternate;
     }
 
     .games-grid {
@@ -606,7 +720,7 @@
     }
 
     @media (max-width: 600px) {
-      header { padding: 8px 12px; width: 94%; }
+      header { padding: 10px 16px 14px; width: 94%; }
       .header-text { font-size: 18px; letter-spacing: 4px; }
       .hero { padding: 90px 16px 40px; }
       .games-section { padding: 60px 16px 100px; }
@@ -794,7 +908,7 @@
     })();
 
     // ============================================================
-    // BEST SCORES (CloudStorage)
+    // BEST SCORES
     // ============================================================
     var BestScores = {
       cache: { snake: 0, sapper: 0, flappy: 0, astro: 0 },
@@ -869,7 +983,6 @@
       document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Полифилл roundRect
     (function() {
       if (typeof CanvasRenderingContext2D !== 'undefined' &&
           !CanvasRenderingContext2D.prototype.roundRect) {
@@ -994,7 +1107,7 @@
     })();
 
     // ============================================================
-    // ИГРОВОЙ ДВИЖОК (delta-time, без ограничения FPS)
+    // ИГРОВОЙ ДВИЖОК (delta-time, без FPS-кап)
     // ============================================================
     (function() {
       var canvas = document.getElementById('gameCanvas');
@@ -1011,7 +1124,6 @@
       var gameOver = false;
       var animationFrame = null;
 
-      // Delta-time
       var lastFrameTime = 0;
       var logicAccumulator = 0;
       var LOGIC_STEP = 1 / 60;
@@ -1078,7 +1190,6 @@
         }
       }
 
-      // ---------- ИНИЦИАЛИЗАЦИЯ ----------
       function initSnake() {
         snake.body = [{x: 10, y: 10},{x: 9, y: 10},{x: 8, y: 10}];
         snake.dir = 'right'; snake.nextDir = 'right';
@@ -1156,7 +1267,6 @@
         updateBestInGame();
       }
 
-      // ---------- ОТРИСОВКА ----------
       function bgColor() { return document.body.classList.contains('theme-light') ? '#dfe8f2' : '#0a0f18'; }
       function gridColor() { return document.body.classList.contains('theme-light') ? '#c0d0e0' : '#1e2a3a'; }
 
@@ -1313,7 +1423,6 @@
         }
       }
 
-      // ---------- ЛОГИКА ----------
       function stepSnake() {
         if (gameOver || isPaused) return;
         if (snake.nextDir === 'up' && snake.dir !== 'down') snake.dir = 'up';
@@ -1415,21 +1524,18 @@
         }
       }
 
-      // ---------- ГЛАВНЫЙ ЦИКЛ ----------
       function mainLoop(timestamp) {
         if (!lastFrameTime) lastFrameTime = timestamp;
         var dt = (timestamp - lastFrameTime) / 1000;
         lastFrameTime = timestamp;
         if (dt > MAX_FRAME) dt = MAX_FRAME;
 
-        // Отрисовка каждый кадр
         clearCanvas();
         if (currentGame === 'snake') drawSnake();
         else if (currentGame === 'sapper') drawSapper();
         else if (currentGame === 'flappy') drawFlappy();
         else if (currentGame === 'astro') drawAstro();
 
-        // Логика фиксированным шагом
         if (!isPaused) {
           logicAccumulator += dt;
           while (logicAccumulator >= LOGIC_STEP) {
@@ -1461,7 +1567,6 @@
         animationFrame = requestAnimationFrame(mainLoop);
       }
 
-      // ---------- НАЗАД ----------
       function handleBackButton() {
         if (modal.classList.contains('active')) closeModalAndStop();
       }
@@ -1489,7 +1594,6 @@
         tgShowBack(handleBackButton);
       }
 
-      // ---------- ВВОД ----------
       window.addEventListener('keydown', function(e) {
         keys[e.key] = true;
         if (currentGame === 'snake') {
