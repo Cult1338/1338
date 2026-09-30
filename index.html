@@ -158,7 +158,7 @@
     }
 
     /* ============================================================
-       ШАПКА с SVG
+       ШАПКА
        ============================================================ */
     header {
       position: fixed;
@@ -186,8 +186,8 @@
 
     .header-wrap {
       width: 100%;
-      max-width: 460px;
-      aspect-ratio: 460 / 90;
+      max-width: 380px;
+      aspect-ratio: 460 / 110;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -197,12 +197,12 @@
       width: 100%;
       height: auto;
       display: block;
-      filter: drop-shadow(0 0 12px rgba(120, 200, 255, 0.55));
+      filter: drop-shadow(0 0 10px rgba(120, 200, 255, 0.5));
     }
 
     @media (max-width: 600px) {
       header { padding: 4px 10px; width: 94%; }
-      .header-wrap { max-width: 340px; }
+      .header-wrap { max-width: 300px; }
     }
 
     /* ---------- ГЛАВНЫЙ ЭКРАН ---------- */
@@ -596,7 +596,7 @@
 </head>
 <body>
 
-  <!-- SVG defs: градиенты и фильтры для ледяного текста -->
+  <!-- SVG defs -->
   <svg width="0" height="0" style="position:absolute; pointer-events:none" aria-hidden="true">
     <defs>
       <linearGradient id="iceGrad" x1="0" y1="0" x2="0" y2="1">
@@ -647,26 +647,20 @@
         <feGaussianBlur stdDeviation="0.3"/>
       </filter>
 
-      <!-- НАРАЩИВАНИЕ ЛЬДА ПО КОНТУРУ БУКВ -->
       <filter id="iceCrust" x="-15%" y="-15%" width="130%" height="140%">
         <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="dilate1"/>
         <feMorphology in="SourceAlpha" operator="dilate" radius="1.2" result="dilate2"/>
         <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="dilate3"/>
-
         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
         <feDisplacementMap in="dilate1" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="wobble1"/>
         <feDisplacementMap in="dilate2" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="wobble2"/>
         <feDisplacementMap in="dilate3" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="wobble3"/>
-
         <feFlood flood-color="#1a4d7a" result="c1"/>
         <feComposite in="c1" in2="wobble1" operator="in" result="ring1"/>
-
         <feFlood flood-color="#4fb0e8" result="c2"/>
         <feComposite in="c2" in2="wobble2" operator="in" result="ring2"/>
-
         <feFlood flood-color="#a8e0ff" result="c3"/>
         <feComposite in="c3" in2="wobble3" operator="in" result="ring3"/>
-
         <feMerge>
           <feMergeNode in="ring1"/>
           <feMergeNode in="ring2"/>
@@ -675,7 +669,6 @@
         </feMerge>
       </filter>
 
-      <!-- ВЕРХНИЙ СНЕГ -->
       <filter id="frostTop" x="-15%" y="-25%" width="130%" height="150%">
         <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="top"/>
         <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="13" result="noise"/>
@@ -698,56 +691,147 @@
   <!-- ШАПКА -->
   <header>
     <div class="header-wrap">
-      <svg class="header-svg" viewBox="0 0 460 90" preserveAspectRatio="xMidYMid meet">
-        <text x="230" y="60" text-anchor="middle"
+      <svg class="header-svg" viewBox="0 0 460 110" preserveAspectRatio="xMidYMid meet">
+        <text id="txt-glow" x="230" y="70" text-anchor="middle"
               font-family="Inter, sans-serif" font-weight="900"
-              font-size="52" letter-spacing="6"
+              font-size="42" letter-spacing="5"
               fill="#4fb0e8" opacity="0.35"
-              filter="url(#iceGlow)">CULT1338</text>
+              filter="url(#iceGlow)"></text>
 
-        <text x="230" y="58" text-anchor="middle"
+        <text id="txt-3d" x="230" y="68" text-anchor="middle"
               font-family="Inter, sans-serif" font-weight="900"
-              font-size="52" letter-spacing="6"
-              fill="#0a2a4a" filter="url(#ice3D)">CULT1338</text>
+              font-size="42" letter-spacing="5"
+              fill="#0a2a4a" filter="url(#ice3D)"></text>
 
-        <text x="230" y="58" text-anchor="middle"
+        <text id="txt-crust" x="230" y="68" text-anchor="middle"
               font-family="Inter, sans-serif" font-weight="900"
-              font-size="52" letter-spacing="6"
-              fill="#0a2a4a"
-              filter="url(#iceCrust)">CULT1338</text>
+              font-size="42" letter-spacing="5"
+              fill="#0a2a4a" filter="url(#iceCrust)"></text>
 
-        <text x="230" y="55" text-anchor="middle"
+        <text id="txt-main" x="230" y="65" text-anchor="middle"
               font-family="Inter, sans-serif" font-weight="900"
-              font-size="52" letter-spacing="6"
+              font-size="42" letter-spacing="5"
               fill="url(#iceGrad)"
               stroke="#1a4d7a" stroke-width="0.6"
-              filter="url(#frostTop)">CULT1338</text>
+              filter="url(#frostTop)"></text>
 
-        <text x="230" y="55" text-anchor="middle"
+        <text id="txt-shine" x="230" y="65" text-anchor="middle"
               font-family="Inter, sans-serif" font-weight="900"
-              font-size="52" letter-spacing="6"
+              font-size="42" letter-spacing="5"
               fill="none"
               stroke="rgba(255,255,255,0.55)" stroke-width="0.6"
-              stroke-dasharray="2 240">CULT1338</text>
+              stroke-dasharray="2 240"></text>
 
         <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
-          <path d="M 60,42 q 1,4 0,10 q 3,-4 4,-10 z"/>
-          <path d="M 90,42 q 1,5 0,12 q 3,-5 4,-12 z"/>
-          <path d="M 130,42 q 1,6 0,14 q 3,-6 5,-14 z"/>
-          <path d="M 175,42 q 1,4 0,9  q 3,-4 4,-9 z"/>
-          <path d="M 220,42 q 1,5 0,11 q 3,-5 4,-11 z"/>
-          <path d="M 265,42 q 1,4 0,10 q 3,-4 4,-10 z"/>
-          <path d="M 310,42 q 1,6 0,13 q 3,-6 5,-13 z"/>
-          <path d="M 350,42 q 1,4 0,9  q 3,-4 4,-9 z"/>
-          <path d="M 395,42 q 1,5 0,11 q 3,-5 4,-11 z"/>
+          <path d="M 60,52 q 1,4 0,9 q 3,-4 4,-9 z"/>
+          <path d="M 90,52 q 1,4 0,10 q 3,-4 4,-10 z"/>
+          <path d="M 130,52 q 1,5 0,12 q 3,-5 5,-12 z"/>
+          <path d="M 175,52 q 1,4 0,8  q 3,-4 4,-8 z"/>
+          <path d="M 220,52 q 1,4 0,9 q 3,-4 4,-9 z"/>
+          <path d="M 265,52 q 1,4 0,8 q 3,-4 4,-8 z"/>
+          <path d="M 310,52 q 1,5 0,11 q 3,-5 5,-11 z"/>
+          <path d="M 350,52 q 1,3 0,8  q 3,-3 4,-8 z"/>
+          <path d="M 395,52 q 1,4 0,9 q 3,-4 4,-9 z"/>
         </g>
 
         <g fill="#c8f0ff" opacity="0.95">
-          <ellipse cx="70"  cy="86" rx="2" ry="3"/>
-          <ellipse cx="150" cy="88" rx="1.6" ry="2.4"/>
-          <ellipse cx="245" cy="86" rx="2.2" ry="3.2"/>
-          <ellipse cx="320" cy="88" rx="1.6" ry="2.4"/>
-          <ellipse cx="400" cy="87" rx="2" ry="3"/>
+          <ellipse cx="70"  cy="92" rx="2" ry="3"/>
+          <ellipse cx="150" cy="94" rx="1.6" ry="2.4"/>
+          <ellipse cx="245" cy="92" rx="2.2" ry="3.2"/>
+          <ellipse cx="320" cy="94" rx="1.6" ry="2.4"/>
+          <ellipse cx="400" cy="93" rx="2" ry="3"/>
+        </g>
+
+        <!-- 🎄 ГИРЛЯНДА -->
+        <g id="garland">
+          <path d="M 20,22 Q 60,10 100,22 T 180,22 T 260,22 T 340,22 T 420,22"
+                fill="none" stroke="#1a3a5a" stroke-width="1.4" opacity="0.9"/>
+          <path d="M 20,22 Q 60,10 100,22 T 180,22 T 260,22 T 340,22 T 420,22"
+                fill="none" stroke="#4fb0e8" stroke-width="0.6" opacity="0.6"
+                filter="url(#icicleSoft)"/>
+
+          <g id="bulbs">
+            <circle cx="40"  cy="22" r="2.6" fill="#7a3a1a">
+              <animate attributeName="fill" values="#ffb800;#7a3a1a;#ffb800" dur="2s" begin="0s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="80"  cy="17" r="2.6" fill="#7a1a1a">
+              <animate attributeName="fill" values="#ff3b3b;#7a1a1a;#ff3b3b" dur="2s" begin="0.18s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.18s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="120" cy="22" r="2.6" fill="#1a5a2a">
+              <animate attributeName="fill" values="#39ff8b;#1a5a2a;#39ff8b" dur="2s" begin="0.36s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.36s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="160" cy="17" r="2.6" fill="#1a3a7a">
+              <animate attributeName="fill" values="#4fb0e8;#1a3a7a;#4fb0e8" dur="2s" begin="0.54s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.54s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="200" cy="22" r="2.6" fill="#5a1a5a">
+              <animate attributeName="fill" values="#d36bff;#5a1a5a;#d36bff" dur="2s" begin="0.72s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.72s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="240" cy="17" r="2.6" fill="#7a3a1a">
+              <animate attributeName="fill" values="#ffb800;#7a3a1a;#ffb800" dur="2s" begin="0.90s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="0.90s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="280" cy="22" r="2.6" fill="#7a1a1a">
+              <animate attributeName="fill" values="#ff3b3b;#7a1a1a;#ff3b3b" dur="2s" begin="1.08s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.08s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="320" cy="17" r="2.6" fill="#1a5a2a">
+              <animate attributeName="fill" values="#39ff8b;#1a5a2a;#39ff8b" dur="2s" begin="1.26s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.26s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="360" cy="22" r="2.6" fill="#1a3a7a">
+              <animate attributeName="fill" values="#4fb0e8;#1a3a7a;#4fb0e8" dur="2s" begin="1.44s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.44s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="400" cy="17" r="2.6" fill="#5a1a5a">
+              <animate attributeName="fill" values="#d36bff;#5a1a5a;#d36bff" dur="2s" begin="1.62s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.62s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="440" cy="22" r="2.6" fill="#7a3a1a">
+              <animate attributeName="fill" values="#ffb800;#7a3a1a;#ffb800" dur="2s" begin="1.80s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.5;1" dur="2s" begin="1.80s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+
+          <g opacity="0.55" filter="url(#iceGlow)">
+            <circle cx="40"  cy="22" r="5" fill="#ffb800">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="0s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="80"  cy="17" r="5" fill="#ff3b3b">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="0.18s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="120" cy="22" r="5" fill="#39ff8b">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="0.36s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="160" cy="17" r="5" fill="#4fb0e8">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="0.54s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="200" cy="22" r="5" fill="#d36bff">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="0.72s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="240" cy="17" r="5" fill="#ffb800">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="0.90s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="280" cy="22" r="5" fill="#ff3b3b">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="1.08s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="320" cy="17" r="5" fill="#39ff8b">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="1.26s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="360" cy="22" r="5" fill="#4fb0e8">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="1.44s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="400" cy="17" r="5" fill="#d36bff">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="1.62s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="440" cy="22" r="5" fill="#ffb800">
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin="1.80s" repeatCount="indefinite"/>
+            </circle>
+          </g>
         </g>
       </svg>
     </div>
@@ -770,8 +854,7 @@
       <text x="450" y="105" text-anchor="middle"
             font-family="Inter, sans-serif" font-weight="900"
             font-size="86" letter-spacing="-1"
-            fill="#0a2a4a"
-            filter="url(#iceCrust)">НОВЫЙ ВЗГЛЯД НА</text>
+            fill="#0a2a4a" filter="url(#iceCrust)">НОВЫЙ ВЗГЛЯД НА</text>
 
       <text x="450" y="100" text-anchor="middle"
             font-family="Inter, sans-serif" font-weight="900"
@@ -817,8 +900,7 @@
       <text x="450" y="240" text-anchor="middle"
             font-family="'Playfair Display', serif" font-style="italic"
             font-size="96"
-            fill="#0a2a4a"
-            filter="url(#iceCrust)">игры</text>
+            fill="#0a2a4a" filter="url(#iceCrust)">игры</text>
       <text x="450" y="235" text-anchor="middle"
             font-family="'Playfair Display', serif" font-style="italic"
             font-size="96"
@@ -873,8 +955,7 @@
       <text x="200" y="60" text-anchor="middle"
             font-family="Inter, sans-serif" font-weight="900"
             font-size="64" letter-spacing="-1"
-            fill="#0a2a4a"
-            filter="url(#iceCrust)">ИГРЫ</text>
+            fill="#0a2a4a" filter="url(#iceCrust)">ИГРЫ</text>
       <text x="200" y="55" text-anchor="middle"
             font-family="Inter, sans-serif" font-weight="900"
             font-size="64" letter-spacing="-1"
@@ -964,9 +1045,6 @@
       return false;
     };
 
-    // ============================================================
-    // TELEGRAM WEBAPP
-    // ============================================================
     var TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
     function tgReady()          { try { TG && TG.ready(); } catch(e){} }
@@ -1014,10 +1092,7 @@
     }
 
     (function initTelegram() {
-      if (!TG) {
-        console.log('Not in Telegram, running in browser mode');
-        return;
-      }
+      if (!TG) { console.log('Not in Telegram'); return; }
       tgReady();
       tgExpand();
       tgDisableSwipes();
@@ -1026,7 +1101,47 @@
       updateViewport();
       TG.onEvent('themeChanged', applyTheme);
       TG.onEvent('viewportChanged', updateViewport);
-      console.log('Telegram WebApp OK | platform:', TG.platform, '| version:', TG.version);
+      console.log('Telegram WebApp OK | platform:', TG.platform);
+    })();
+
+    // ============================================================
+    // TYPEWRITER для SVG-текста CULT1338
+    // ============================================================
+    (function svgTypewriter() {
+      var ids = ['txt-glow', 'txt-3d', 'txt-crust', 'txt-main', 'txt-shine'];
+      var fullText = 'CULT1338';
+      var index = 0;
+      var state = 'typing';
+
+      var nodes = ids.map(function(id) { return document.getElementById(id); }).filter(Boolean);
+      if (nodes.length === 0) { console.log('SVG typewriter: элементы не найдены'); return; }
+
+      function setText(s) {
+        nodes.forEach(function(n) { n.textContent = s; });
+      }
+
+      function tick() {
+        if (state === 'typing') {
+          index++;
+          setText(fullText.slice(0, index));
+          if (index >= fullText.length) {
+            state = 'waiting';
+            setTimeout(function() { state = 'deleting'; tick(); }, 10000);
+            return;
+          }
+          setTimeout(tick, 180);
+        } else if (state === 'deleting') {
+          index--;
+          setText(fullText.slice(0, index));
+          if (index <= 0) {
+            state = 'pausing';
+            setTimeout(function() { state = 'typing'; tick(); }, 500);
+            return;
+          }
+          setTimeout(tick, 80);
+        }
+      }
+      setTimeout(tick, 300);
     })();
 
     // ============================================================
@@ -1065,7 +1180,6 @@
       update: function(game, score) {
         if (score <= (this.cache[game] || 0)) return false;
         this.cache[game] = score;
-
         var key = 'best_' + game;
         if (TG && TG.CloudStorage) {
           TG.CloudStorage.setItem(key, String(score), function(){});
@@ -1094,7 +1208,7 @@
 
     BestScores.load(function() {
       BestScores.render();
-      console.log('Best scores loaded:', BestScores.cache);
+      console.log('Best scores:', BestScores.cache);
     });
 
     // ============================================================
