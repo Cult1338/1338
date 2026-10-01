@@ -1,2419 +1,1646 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#04070d">
-  <title>Cult1338 — Игры</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIMOEGOROV — pizzeria d'autore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Anton&display=swap" rel="stylesheet">
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+    --ink: #0a0a0a;
+    --ink-2: #141414;
+    --cream: #f1ece2;
+    --lime: #d4ff2b;
+    --orange: #ff5722;
+    --line: #2a2a2a;
+    --muted: #6b6b6b;
+}
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&family=Lobster&family=Press+Start+2P&family=Caveat:wght@700&family=Bebas+Neue&family=Great+Vibes&family=Russo+One&family=Pacifico&family=Marck+Script&family=Bad+Script&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --bg-primary:     #04070d;
-      --bg-secondary:   #060e1a;
-      --bg-card:        rgba(6, 14, 26, 0.75);
-      --border-color:   rgba(120, 200, 255, 0.15);
-      --border-strong:  rgba(120, 200, 255, 0.35);
-      --text-primary:   #eaf4ff;
-      --text-secondary: #8ba8c5;
-      --text-muted:     #5a7a96;
-      --accent:         #7fd4ff;
-      --accent-glow:    rgba(120, 200, 255, 0.4);
-      --danger:         #ff4d6d;
+html { scroll-behavior: smooth; }
 
-      --tg-safe-top:    0px;
-      --tg-safe-bottom: 0px;
-      --tg-viewport-height: 100vh;
+body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>");
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+::selection { background: var(--lime); color: var(--ink); }
+
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   ЭКРАН @OWTimoshenko (по умолчанию скрыт)
+   ============================================================ */
+.ow-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.ow-screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ow-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>");
+}
+
+.ow-screen__frame {
+    position: absolute;
+    inset: 16px;
+    border: 1px solid var(--line);
+    pointer-events: none;
+}
+
+.ow-screen__corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--lime);
+    pointer-events: none;
+}
+
+.ow-screen__corner--tl { top: 16px; left: 16px;    border-right: none; border-bottom: none; }
+.ow-screen__corner--tr { top: 16px; right: 16px;   border-left: none;  border-bottom: none; }
+.ow-screen__corner--bl { bottom: 16px; left: 16px; border-right: none; border-top: none;    }
+.ow-screen__corner--br { bottom: 16px; right: 16px; border-left: none; border-top: none;   }
+
+.ow-screen__title {
+    position: relative;
+    z-index: 2;
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 18vw, 340px);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    color: var(--lime);
+    text-align: center;
+    user-select: none;
+    padding: 0 20px;
+    word-break: break-word;
+    opacity: 0;
+    transform: scale(0.9);
+    filter: blur(12px);
+    transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ow-screen.active .ow-screen__title {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+    animation: owGlow 3s ease-in-out infinite 1s;
+}
+
+.ow-screen__title .at {
+    color: var(--orange);
+    margin-right: 0.05em;
+}
+
+@keyframes owGlow {
+    0%, 100% { text-shadow: 0 0 40px rgba(212, 255, 43, 0.3), 0 0 80px rgba(212, 255, 43, 0.15); }
+    50%      { text-shadow: 0 0 60px rgba(212, 255, 43, 0.6), 0 0 120px rgba(212, 255, 43, 0.3); }
+}
+
+.ow-screen__tag {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--muted);
+    z-index: 3;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 1.2s ease 0.6s;
+}
+
+.ow-screen.active .ow-screen__tag { opacity: 1; }
+
+.ow-screen__tag::before {
+    content: '◆ ';
+    color: var(--orange);
+}
+
+.ow-screen__back {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    z-index: 5;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 10px 18px;
+    transition: all 0.2s;
+}
+
+.ow-screen__back:hover {
+    color: var(--lime);
+    border-color: var(--lime);
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95), rgba(10,10,10,0));
+    pointer-events: none;
+}
+
+.nav > * { pointer-events: auto; }
+
+.nav__brand {
+    font-family: 'Anton', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav__brand-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--lime);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--lime);
+}
+
+.nav__menu {
+    display: flex;
+    gap: 32px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+}
+
+.nav__menu a {
+    position: relative;
+    padding: 4px 0;
+    transition: color 0.2s;
+}
+
+.nav__menu a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--lime);
+    transition: width 0.25s;
+}
+
+.nav__menu a:hover { color: var(--lime); }
+.nav__menu a:hover::before { width: 100%; }
+
+.nav__phone {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--lime);
+    border: 1px solid var(--lime);
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.nav__phone:hover {
+    background: var(--lime);
+    color: var(--ink);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+    min-height: 100vh;
+    padding: 140px 0 60px;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 32px;
+}
+
+.hero__grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: end;
+    width: 100%;
+}
+
+.hero__vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 8px;
+    align-self: stretch;
+    display: flex;
+    align-items: flex-end;
+}
+
+.hero__main { max-width: 1100px; }
+
+.hero__meta {
+    display: flex;
+    gap: 24px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 32px;
+}
+
+.hero__meta span::before {
+    content: '◆ ';
+    color: var(--lime);
+}
+
+.hero__title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(60px, 12vw, 200px);
+    line-height: 0.82;
+    letter-spacing: -0.03em;
+    color: var(--cream);
+    text-transform: uppercase;
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.hero__title .outline {
+    -webkit-text-stroke: 3px var(--cream);
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    display: block;
+}
+
+.hero__title .accent {
+    color: var(--lime);
+    display: block;
+}
+
+.hero__bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 48px;
+    align-items: end;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+}
+
+.hero__desc {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 420px;
+}
+
+.hero__desc b {
+    color: var(--cream);
+    font-weight: 400;
+}
+
+.hero__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 32px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat__num {
+    font-family: 'Anton', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+}
+
+.stat__num .u {
+    font-size: 0.5em;
+    color: var(--lime);
+    margin-left: 4px;
+}
+
+.stat__label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.hero__scroll {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--lime);
+    padding-bottom: 8px;
+    animation: bob 2.5s ease-in-out infinite;
+    align-self: end;
+}
+
+@keyframes bob {
+    0%, 100% { transform: rotate(180deg) translateY(0); }
+    50%      { transform: rotate(180deg) translateY(-8px); }
+}
+
+/* ============================================================
+   TICKER
+   ============================================================ */
+.ticker {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 0;
+    overflow: hidden;
+    background: var(--ink-2);
+    margin-top: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.ticker__inner {
+    display: flex;
+    gap: 60px;
+    white-space: nowrap;
+    animation: scroll 40s linear infinite;
+    font-family: 'Anton', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cream);
+}
+
+.ticker__inner span {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+}
+
+.ticker__inner .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--lime);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ticker__inner .outline {
+    -webkit-text-stroke: 1px var(--cream);
+    -webkit-text-fill-color: transparent;
+}
+
+@keyframes scroll {
+    to { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   SECTION HEAD
+   ============================================================ */
+.section {
+    padding: 100px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.section__head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: baseline;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 60px;
+}
+
+.section__num {
+    font-family: 'Anton', sans-serif;
+    font-size: 48px;
+    line-height: 1;
+    color: var(--lime);
+}
+
+.section__title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(32px, 5vw, 64px);
+    letter-spacing: -0.01em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--cream);
+}
+
+.section__sub {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ============================================================
+   MENU GRID
+   ============================================================ */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+}
+
+.pizza {
+    grid-column: span 4;
+    border: 1px solid var(--line);
+    background: var(--ink-2);
+    padding: 32px 28px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.3s,
+                border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    cursor: pointer;
+}
+
+.pizza:hover {
+    background: #0f0f0f;
+    border-color: var(--lime);
+    transform: translateY(-6px);
+}
+
+.pizza:hover .pizza__art {
+    color: var(--lime);
+    transform: rotate(-8deg) scale(1.05);
+}
+
+.pizza:hover .pizza__name { color: var(--lime); }
+.pizza:hover .pizza__num  { color: var(--orange); }
+
+.pizza:nth-child(1) { grid-column: span 5; }
+.pizza:nth-child(2) { grid-column: span 4; }
+.pizza:nth-child(3) { grid-column: span 3; }
+.pizza:nth-child(4) { grid-column: span 3; }
+.pizza:nth-child(5) { grid-column: span 5; }
+.pizza:nth-child(6) { grid-column: span 4; }
+
+.pizza__top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+}
+
+.pizza__num {
+    font-family: 'Anton', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--cream);
+    transition: color 0.3s;
+}
+
+.pizza__tag {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    transition: all 0.3s;
+}
+
+.pizza:hover .pizza__tag {
+    border-color: var(--lime);
+    color: var(--lime);
+}
+
+.pizza__art {
+    font-family: 'Anton', sans-serif;
+    font-size: 110px;
+    line-height: 0.8;
+    color: #2a2a2a;
+    margin: 0 auto 32px;
+    transition: color 0.4s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    letter-spacing: -0.05em;
+}
+
+.pizza__name {
+    font-family: 'Anton', sans-serif;
+    font-size: 26px;
+    line-height: 1;
+    color: var(--cream);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+}
+
+.pizza__latin {
+    font-style: italic;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+}
+
+.pizza__ingredients {
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 24px;
+    border-top: 1px dashed var(--line);
+    padding-top: 16px;
+}
+
+.pizza__ingredients b {
+    color: var(--cream);
+    font-weight: 400;
+}
+
+.pizza__bottom {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.pizza__price {
+    font-family: 'Anton', sans-serif;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--lime);
+    letter-spacing: -0.02em;
+}
+
+.pizza__price small {
+    font-size: 0.4em;
+    color: var(--muted);
+    margin-left: 4px;
+    font-family: 'Space Mono', monospace;
+}
+
+.pizza__heat {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+}
+
+.pizza__heat .bar {
+    width: 3px;
+    height: 12px;
+    background: #2a2a2a;
+    transition: background 0.3s;
+}
+
+.pizza__heat .bar.on {
+    background: var(--orange);
+}
+
+.pizza:hover .pizza__heat .bar.on {
+    background: var(--lime);
+}
+
+/* ============================================================
+   PHILOSOPHY
+   ============================================================ */
+.philosophy {
+    background: var(--cream);
+    color: var(--ink);
+    padding: 100px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.philosophy .container {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 80px;
+    align-items: start;
+}
+
+.philosophy__left {
+    position: sticky;
+    top: 120px;
+}
+
+.philosophy__label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.philosophy__label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--ink);
+}
+
+.philosophy__title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(40px, 6vw, 88px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 32px;
+}
+
+.philosophy__title em {
+    font-style: normal;
+    color: var(--orange);
+}
+
+.philosophy__quote {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--ink);
+    padding-left: 20px;
+    border-left: 3px solid var(--ink);
+}
+
+.philosophy__right {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.philosophy__text {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--ink);
+}
+
+.philosophy__text b {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 2px 6px;
+    font-weight: 400;
+}
+
+.philosophy__text em {
+    font-style: normal;
+    background: var(--lime);
+    padding: 2px 6px;
+}
+
+.principles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.principle {
+    border-top: 2px solid var(--ink);
+    padding-top: 16px;
+}
+
+.principle__num {
+    font-family: 'Anton', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--orange);
+    margin-bottom: 8px;
+}
+
+.principle__title {
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--ink);
+}
+
+.principle__desc {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+/* ============================================================
+   BOOKING
+   ============================================================ */
+.booking {
+    padding: 100px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.booking__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+}
+
+.booking__info h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(40px, 5vw, 72px);
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+}
+
+.booking__info h2 em {
+    font-style: normal;
+    color: var(--lime);
+}
+
+.booking__info p {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 40px;
+    max-width: 480px;
+}
+
+.booking__info p b {
+    color: var(--cream);
+    font-weight: 400;
+}
+
+.contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.contact-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+}
+
+.contact-row__label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 2px;
+}
+
+.contact-row__value {
+    font-family: 'Anton', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.01em;
+    color: var(--cream);
+    text-transform: uppercase;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.contact-row__value a:hover {
+    color: var(--lime);
+}
+
+.hours {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 20px;
+}
+
+.hours__day {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    padding: 12px 4px;
+    border: 1px solid var(--line);
+    transition: all 0.2s;
+    cursor: default;
+}
+
+.hours__day:hover {
+    border-color: var(--lime);
+    background: var(--ink-2);
+}
+
+.hours__day.today {
+    border-color: var(--lime);
+    background: var(--lime);
+    color: var(--ink);
+}
+
+.hours__day.today .hours__name,
+.hours__day.today .hours__time {
+    color: var(--ink);
+}
+
+.hours__name {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.hours__time {
+    font-family: 'Anton', sans-serif;
+    font-size: 14px;
+    color: var(--cream);
+}
+
+.booking__form {
+    border: 1px solid var(--line);
+    background: var(--ink-2);
+    padding: 40px;
+    position: relative;
+}
+
+.booking__form::before {
+    content: 'ФОРМА БРОНИРОВАНИЯ';
+    position: absolute;
+    top: -8px;
+    left: 24px;
+    padding: 0 12px;
+    background: var(--ink);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--lime);
+}
+
+.field {
+    margin-bottom: 24px;
+}
+
+.field__label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0;
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-bottom-color: var(--lime);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: #333;
+}
+
+.field select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.field select option {
+    background: var(--ink);
+    color: var(--cream);
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 32px;
+    background: var(--lime);
+    color: var(--ink);
+    font-family: 'Anton', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    width: 100%;
+    margin-top: 20px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+}
+
+.btn:hover {
+    background: var(--orange);
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.booking__note {
+    margin-top: 20px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+    padding: 80px 0 40px;
+    border-top: 1px solid var(--line);
+    background: var(--ink-2);
+    position: relative;
+    z-index: 2;
+}
+
+.footer__brand {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(72px, 18vw, 240px);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.footer__brand span { display: inline-block; }
+
+.footer__brand span.outline {
+    -webkit-text-stroke: 2px var(--cream);
+    -webkit-text-fill-color: transparent;
+}
+
+.footer__brand span.accent { color: var(--lime); }
+
+.footer__bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.footer__col h4 {
+    color: var(--cream);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+}
+
+.footer__col a {
+    display: block;
+    padding: 4px 0;
+    color: var(--muted);
+    transition: color 0.2s;
+    word-break: break-word;
+}
+
+.footer__col a:hover { color: var(--lime); }
+
+.footer__legal {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1000px) {
+    .hero__grid { grid-template-columns: 1fr; gap: 0; }
+    .hero__vertical { display: none; }
+    .hero__bottom { grid-template-columns: 1fr; gap: 32px; }
+    .hero__scroll { display: none; }
+
+    .pizza,
+    .pizza:nth-child(1), .pizza:nth-child(2), .pizza:nth-child(3),
+    .pizza:nth-child(4), .pizza:nth-child(5), .pizza:nth-child(6) {
+        grid-column: span 6;
     }
 
-    body.theme-light {
-      --bg-primary:     #f0f4f8;
-      --bg-secondary:   #ffffff;
-      --bg-card:        rgba(255, 255, 255, 0.9);
-      --border-color:   rgba(60, 120, 180, 0.2);
-      --border-strong:  rgba(60, 120, 180, 0.45);
-      --text-primary:   #0a1a2a;
-      --text-secondary: #4a6a85;
-      --text-muted:     #7a94a8;
-      --accent:         #2a90c8;
-      --accent-glow:    rgba(60, 140, 200, 0.35);
-      --danger:         #d93a5a;
+    .philosophy .container { grid-template-columns: 1fr; gap: 40px; }
+    .philosophy__left { position: static; }
+    .booking__grid { grid-template-columns: 1fr; gap: 48px; }
+    .footer__bottom { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .container { padding: 0 20px; }
+    .nav { padding: 16px 20px; }
+    .nav__menu { display: none; }
+    .hero { padding: 100px 0 40px; }
+
+    .pizza,
+    .pizza:nth-child(1), .pizza:nth-child(2), .pizza:nth-child(3),
+    .pizza:nth-child(4), .pizza:nth-child(5), .pizza:nth-child(6) {
+        grid-column: span 12;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+    .section { padding: 60px 0; }
+    .section__head { grid-template-columns: auto 1fr; gap: 16px; }
+    .section__sub { display: none; }
+
+    .hero__meta { flex-wrap: wrap; gap: 12px; }
+    .hero__stats { gap: 16px; }
+
+    .principles { grid-template-columns: 1fr; }
+    .booking__form { padding: 24px; }
+    .field-row { grid-template-columns: 1fr; }
+    .hours { grid-template-columns: repeat(4, 1fr); }
+    .footer__legal { flex-direction: column; gap: 12px; }
+
+    .contact-row { grid-template-columns: 80px 1fr; gap: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
-
-    html, body {
-      width: 100%;
-      overflow-x: hidden;
-      min-height: var(--tg-viewport-height);
-    }
-
-    body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
-      scroll-behavior: smooth;
-      position: relative;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    body.tg-webapp {
-      padding-top: var(--tg-safe-top);
-      padding-bottom: var(--tg-safe-bottom);
-    }
-
-    .bg-forest {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1920&q=80');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      filter: brightness(0.22) saturate(0.5) hue-rotate(180deg);
-      z-index: -2;
-      pointer-events: none;
-      transition: filter 0.3s;
-    }
-
-    body.theme-light .bg-forest {
-      filter: brightness(0.9) saturate(0.6) hue-rotate(180deg);
-      opacity: 0.4;
-    }
-
-    .bg-forest::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(180deg, #071520 0%, #04070d 100%);
-      opacity: 0.7;
-    }
-
-    body.theme-light .bg-forest::after {
-      background: linear-gradient(180deg, #f0f6ff 0%, #e0eaf5 100%);
-      opacity: 0.85;
-    }
-
-    .bg-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(180deg, rgba(2,8,20,0.75) 0%, rgba(1,4,12,0.92) 100%);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    body.theme-light .bg-overlay {
-      background: linear-gradient(180deg, rgba(240,246,255,0.4) 0%, rgba(220,230,245,0.7) 100%);
-    }
-
-    #snowCanvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    body.theme-light #snowCanvas { opacity: 0.3; }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image:
-        linear-gradient(rgba(180, 220, 255, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(180, 220, 255, 0.025) 1px, transparent 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    body.theme-light::before {
-      background-image:
-        linear-gradient(rgba(60, 120, 180, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(60, 120, 180, 0.05) 1px, transparent 1px);
-    }
-
-    .glow-top {
-      position: fixed;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 400px;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(70px);
-      opacity: 0.4;
-    }
-
-    header {
-      position: fixed;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg-card);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid var(--border-color);
-      border-radius: 50px;
-      padding: 6px 14px;
-      width: 92%;
-      max-width: 800px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px var(--accent-glow);
-      transition: top 0.3s;
-      overflow: hidden;
-    }
-
-    body.tg-webapp header { top: calc(15px + var(--tg-safe-top)); }
-
-    .header-wrap {
-      width: 100%;
-      max-width: 380px;
-      aspect-ratio: 460 / 110;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 0 10px rgba(120, 200, 255, 0.5));
-    }
-
-    @media (max-width: 600px) {
-      header { padding: 4px 10px; width: 94%; }
-      .header-wrap { max-width: 300px; }
-    }
-
-    .hero {
-      min-height: var(--tg-viewport-height);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-      z-index: 2;
-      padding: 100px 20px 60px;
-    }
-
-    body.tg-webapp .hero {
-      padding-top: calc(100px + var(--tg-safe-top));
-    }
-
-    .hero-svg {
-      width: 100%;
-      max-width: 900px;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      filter: drop-shadow(0 0 20px rgba(120, 200, 255, 0.45))
-              drop-shadow(0 0 50px rgba(80, 170, 240, 0.25));
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 16px;
-      margin-top: 36px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .btn-primary {
-      background: var(--bg-card);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid var(--border-strong);
-      color: var(--text-primary);
-      padding: 16px 32px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .btn-primary:active {
-      transform: scale(0.97);
-      background: var(--accent-glow);
-    }
-
-    .arrow-down {
-      margin-top: 70px;
-      animation: bounce 2s infinite;
-      cursor: pointer;
-      opacity: 0.7;
-    }
-
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
-    }
-
-    .games-section {
-      padding: 80px 20px 120px;
-      max-width: 1200px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-    }
-
-    .section-svg {
-      width: 100%;
-      max-width: 320px;
-      height: auto;
-      display: block;
-      margin-bottom: 45px;
-      filter: drop-shadow(0 0 14px rgba(120, 200, 255, 0.4))
-              drop-shadow(0 0 30px rgba(80, 170, 240, 0.2));
-    }
-
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
-
-    .game-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 26px 22px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 160px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    body.theme-light .game-card {
-      box-shadow: 0 8px 20px rgba(60, 120, 180, 0.1);
-    }
-
-    .game-card:active {
-      transform: scale(0.98);
-      border-color: var(--border-strong);
-    }
-
-    .game-card:hover {
-      border-color: var(--border-strong);
-      box-shadow: 0 20px 45px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow);
-    }
-
-    .game-card::after {
-      content: '→';
-      position: absolute;
-      bottom: 22px;
-      right: 22px;
-      font-size: 20px;
-      color: var(--text-muted);
-      transition: all 0.3s;
-    }
-
-    .game-card:hover::after {
-      color: var(--accent);
-      transform: translateX(5px);
-    }
-
-    .game-card h3 {
-      font-size: 17px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-      color: var(--text-primary);
-    }
-
-    .game-card p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-      max-width: 90%;
-    }
-
-    .game-card .best-score {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: var(--accent-glow);
-      border: 1px solid var(--border-strong);
-      color: var(--text-primary);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 4px 8px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      display: none;
-    }
-
-    .game-card .best-score.visible { display: block; }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(2, 6, 14, 0.94);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-    }
-
-    body.theme-light .modal-overlay {
-      background: rgba(220, 230, 245, 0.95);
-    }
-
-    body.tg-webapp .modal-overlay {
-      padding-top: calc(12px + var(--tg-safe-top));
-      padding-bottom: calc(12px + var(--tg-safe-bottom));
-    }
-
-    .modal-overlay.active { display: flex; }
-
-    .modal-content {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-strong);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 900px;
-      max-height: calc(var(--tg-viewport-height) - var(--tg-safe-top) - var(--tg-safe-bottom) - 24px);
-      overflow-y: auto;
-      position: relative;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 50px var(--accent-glow);
-    }
-
-    body.theme-light .modal-content {
-      box-shadow: 0 30px 60px rgba(60, 120, 180, 0.25);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--border-color);
-      background: var(--bg-card);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .modal-header h2 {
-      font-size: 16px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--text-primary);
-    }
-
-    .modal-header h2 span:first-child {
-      color: var(--accent);
-      text-shadow: 0 0 15px var(--accent-glow);
-    }
-
-    .close-btn {
-      background: transparent;
-      border: 1px solid var(--border-strong);
-      color: var(--text-secondary);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-family: inherit;
-      flex-shrink: 0;
-    }
-
-    .close-btn:active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: var(--bg-primary);
-    }
-
-    .modal-body {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--bg-primary);
-    }
-
-    .game-score-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding: 0 6px;
-    }
-
-    .game-score-bar .score-label {
-      color: var(--text-muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-
-    .game-score-bar .score-value {
-      color: var(--accent);
-      font-size: 22px;
-      font-weight: 800;
-      text-shadow: 0 0 15px var(--accent-glow);
-    }
-
-    .game-score-bar .best-in-game {
-      color: var(--text-secondary);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    canvas#gameCanvas {
-      display: block;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      aspect-ratio: 2 / 1;
-      background: #0a0f18;
-      border: 1px solid var(--border-color);
-      cursor: pointer;
-      touch-action: none;
-    }
-
-    body.theme-light canvas#gameCanvas { background: #dfe8f2; }
-
-    .game-controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      width: 100%;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .ctrl-btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border-strong);
-      color: var(--text-primary);
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .ctrl-btn:active {
-      background: var(--accent-glow);
-      border-color: var(--accent);
-      color: var(--text-primary);
-    }
-
-    .game-hint {
-      margin-top: 12px;
-      color: var(--text-muted);
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      text-align: center;
-      padding: 0 10px;
-    }
-
-    @media (max-width: 600px) {
-      .hero { padding: 90px 16px 40px; }
-      .games-section { padding: 60px 16px 100px; }
-      .modal-body { padding: 10px; }
-      .modal-header { padding: 12px 16px; }
-      .modal-header h2 { font-size: 14px; }
-      .ctrl-btn { padding: 8px 14px; font-size: 10px; }
-      .hero-svg { max-width: 100%; }
-    }
-
-    #errorBox {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(200, 20, 20, 0.95);
-      color: #fff;
-      font-family: monospace;
-      font-size: 11px;
-      padding: 8px;
-      z-index: 9999;
-      display: none;
-      word-break: break-all;
-      max-height: 30vh;
-      overflow-y: auto;
-    }
-  </style>
+    html { scroll-behavior: auto; }
+}
+</style>
 </head>
 <body>
 
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <symbol id="rank-herald" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#7cb342" stroke="#4a7a24" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#9ccc65"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#2e5b1a"/>
-        <circle cx="32" cy="27" r="2.5" fill="#d4ffa0"/>
-        <path d="M20 10 l2 2 l3 -2 l-3 4 z" fill="#ffe066"/>
-        <circle cx="32" cy="4" r="2" fill="#ffe066"/>
-      </symbol>
+<!-- ============================================================
+     ЭКРАН @OWTimoshenko (скрыт по умолчанию)
+     ============================================================ -->
+<div class="ow-screen" id="owScreen">
+    <div class="ow-screen__frame"></div>
+    <div class="ow-screen__corner ow-screen__corner--tl"></div>
+    <div class="ow-screen__corner ow-screen__corner--tr"></div>
+    <div class="ow-screen__corner ow-screen__corner--bl"></div>
+    <div class="ow-screen__corner ow-screen__corner--br"></div>
 
-      <symbol id="rank-guardian" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#8d6e63" stroke="#5a453c" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#a1887f"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#4a2c1a"/>
-        <circle cx="32" cy="27" r="2.5" fill="#ffd7a0"/>
-        <circle cx="26" cy="4" r="2" fill="#ffe066"/>
-        <circle cx="38" cy="4" r="2" fill="#ffe066"/>
-      </symbol>
+    <a href="#" class="ow-screen__back" id="owBack">← Назад</a>
 
-      <symbol id="rank-crusader" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#26a69a" stroke="#0d6b62" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#4db6ac"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#0d4b45"/>
-        <path d="M30 24 h4 v4 h-4 z" fill="#ffffff"/>
-        <circle cx="32" cy="27" r="1.5" fill="#a0ffea"/>
-        <circle cx="22" cy="4" r="2" fill="#ffe066"/>
-        <circle cx="32" cy="4" r="2" fill="#ffe066"/>
-        <circle cx="42" cy="4" r="2" fill="#ffe066"/>
-      </symbol>
+    <div class="ow-screen__title"><span class="at">@</span>OWTimoshenko</div>
+    <div class="ow-screen__tag">timoegorov pizzeria // mmxxvi</div>
+</div>
 
-      <symbol id="rank-archon" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#66bb6a" stroke="#2e7d32" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#81c784"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#1b5e20"/>
-        <circle cx="32" cy="27" r="2.5" fill="#c8ffc8"/>
-        <circle cx="18" cy="4" r="1.8" fill="#ffe066"/>
-        <circle cx="27" cy="4" r="1.8" fill="#ffe066"/>
-        <circle cx="37" cy="4" r="1.8" fill="#ffe066"/>
-        <circle cx="46" cy="4" r="1.8" fill="#ffe066"/>
-      </symbol>
+<!-- ============================================================
+     САЙТ ПИЦЦЕРИИ
+     ============================================================ -->
 
-      <symbol id="rank-legend" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#ab47bc" stroke="#6a1b9a" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#ce93d8"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#4a148c"/>
-        <circle cx="32" cy="27" r="3" fill="#ff4d6d"/>
-        <circle cx="32" cy="27" r="1.5" fill="#ffb0c0"/>
-        <circle cx="17" cy="4" r="1.6" fill="#ffe066"/>
-        <circle cx="24" cy="4" r="1.6" fill="#ffe066"/>
-        <circle cx="32" cy="4" r="1.6" fill="#ffe066"/>
-        <circle cx="40" cy="4" r="1.6" fill="#ffe066"/>
-        <circle cx="47" cy="4" r="1.6" fill="#ffe066"/>
-      </symbol>
-
-      <symbol id="rank-ancient" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#5c6bc0" stroke="#283593" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#7986cb"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#1a237e"/>
-        <circle cx="32" cy="28" r="3" fill="#ff6bff"/>
-        <circle cx="32" cy="28" r="1.5" fill="#ffffff"/>
-        <path d="M12 20 Q6 24 10 32 Q14 30 16 24 Z" fill="#9fa8da" opacity="0.8"/>
-        <path d="M52 20 Q58 24 54 32 Q50 30 48 24 Z" fill="#9fa8da" opacity="0.8"/>
-        <circle cx="17" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="24" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="32" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="40" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="47" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="55" cy="4" r="1.5" fill="#ffe066"/>
-      </symbol>
-
-      <symbol id="rank-divine" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#42a5f5" stroke="#0d47a1" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#64b5f6"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#0d47a1"/>
-        <circle cx="32" cy="27" r="3.5" fill="#ff6bff"/>
-        <circle cx="32" cy="27" r="1.8" fill="#ffffff"/>
-        <path d="M10 18 Q4 24 8 34 Q14 32 16 22 Z" fill="#90caf9"/>
-        <path d="M54 18 Q60 24 56 34 Q50 32 48 22 Z" fill="#90caf9"/>
-        <circle cx="16" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="23" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="32" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="41" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="48" cy="4" r="1.5" fill="#ffe066"/>
-        <circle cx="55" cy="4" r="1.5" fill="#ffe066"/>
-      </symbol>
-
-      <symbol id="rank-immortal" viewBox="0 0 64 64">
-        <path d="M32 4 L52 14 L52 34 Q52 48 32 60 Q12 48 12 34 L12 14 Z" fill="#ffb300" stroke="#b26a00" stroke-width="1.5"/>
-        <path d="M32 12 L46 19 L46 34 Q46 44 32 52 Q18 44 18 34 L18 19 Z" fill="#ffca28"/>
-        <path d="M32 20 L40 27 L32 40 L24 27 Z" fill="#5a3a00"/>
-        <circle cx="32" cy="27" r="4" fill="#ff3b3b"/>
-        <circle cx="32" cy="27" r="2" fill="#ffe066"/>
-        <path d="M10 18 Q4 24 8 34 Q14 32 16 22 Z" fill="#ffe082"/>
-        <path d="M54 18 Q60 24 56 34 Q50 32 48 22 Z" fill="#ffe082"/>
-        <path d="M22 6 L26 2 L30 6 L34 2 L38 6 L42 2 L42 8 L22 8 Z" fill="#ffd54f"/>
-        <circle cx="20" cy="4" r="1.3" fill="#ffe066"/>
-        <circle cx="44" cy="4" r="1.3" fill="#ffe066"/>
-      </symbol>
-    </defs>
-  </svg>
-
-  <svg width="0" height="0" style="position:absolute; pointer-events:none" aria-hidden="true">
-    <defs>
-      <linearGradient id="iceGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#ffffff"/>
-        <stop offset="18%"  stop-color="#eaf9ff"/>
-        <stop offset="45%"  stop-color="#a8e0ff"/>
-        <stop offset="72%"  stop-color="#4fb0e8"/>
-        <stop offset="100%" stop-color="#1d5f96"/>
-      </linearGradient>
-
-      <linearGradient id="icicleGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stop-color="#eaf9ff"/>
-        <stop offset="60%"  stop-color="#a0dcff"/>
-        <stop offset="100%" stop-color="#5fb8e8" stop-opacity="0.3"/>
-      </linearGradient>
-
-      <filter id="iceGlow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="4" result="blur"/>
-        <feMerge>
-          <feMergeNode in="blur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-
-      <filter id="ice3D" x="-20%" y="-20%" width="140%" height="160%">
-        <feOffset in="SourceAlpha" dx="0" dy="1" result="o1"/>
-        <feOffset in="SourceAlpha" dx="0" dy="2" result="o2"/>
-        <feOffset in="SourceAlpha" dx="0" dy="3" result="o3"/>
-        <feOffset in="SourceAlpha" dx="0" dy="4" result="o4"/>
-        <feOffset in="SourceAlpha" dx="0" dy="5" result="o5"/>
-        <feOffset in="SourceAlpha" dx="0" dy="6" result="o6"/>
-        <feOffset in="SourceAlpha" dx="0" dy="7" result="o7"/>
-        <feOffset in="SourceAlpha" dx="0" dy="8" result="o8"/>
-        <feMerge>
-          <feMergeNode in="o8"/>
-          <feMergeNode in="o7"/>
-          <feMergeNode in="o6"/>
-          <feMergeNode in="o5"/>
-          <feMergeNode in="o4"/>
-          <feMergeNode in="o3"/>
-          <feMergeNode in="o2"/>
-          <feMergeNode in="o1"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-
-      <filter id="icicleSoft">
-        <feGaussianBlur stdDeviation="0.3"/>
-      </filter>
-
-      <filter id="iceCrust" x="-15%" y="-15%" width="130%" height="140%">
-        <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="dilate1"/>
-        <feMorphology in="SourceAlpha" operator="dilate" radius="1.2" result="dilate2"/>
-        <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="dilate3"/>
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise"/>
-        <feDisplacementMap in="dilate1" in2="noise" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="wobble1"/>
-        <feDisplacementMap in="dilate2" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="wobble2"/>
-        <feDisplacementMap in="dilate3" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="wobble3"/>
-        <feFlood flood-color="#1a4d7a" result="c1"/>
-        <feComposite in="c1" in2="wobble1" operator="in" result="ring1"/>
-        <feFlood flood-color="#4fb0e8" result="c2"/>
-        <feComposite in="c2" in2="wobble2" operator="in" result="ring2"/>
-        <feFlood flood-color="#a8e0ff" result="c3"/>
-        <feComposite in="c3" in2="wobble3" operator="in" result="ring3"/>
-        <feMerge>
-          <feMergeNode in="ring1"/>
-          <feMergeNode in="ring2"/>
-          <feMergeNode in="ring3"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-
-      <filter id="frostTop" x="-15%" y="-25%" width="130%" height="150%">
-        <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="top"/>
-        <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="13" result="noise"/>
-        <feDisplacementMap in="top" in2="noise" scale="4.5" xChannelSelector="R" yChannelSelector="G" result="wobble"/>
-        <feFlood flood-color="#ffffff" result="white"/>
-        <feComposite in="white" in2="wobble" operator="in" result="snow"/>
-        <feMerge>
-          <feMergeNode in="SourceGraphic"/>
-          <feMergeNode in="snow"/>
-        </feMerge>
-      </filter>
-    </defs>
-  </svg>
-
-  <div class="bg-forest"></div>
-  <div class="bg-overlay"></div>
-  <canvas id="snowCanvas"></canvas>
-  <div class="glow-top"></div>
-
-  <header>
-    <div class="header-wrap">
-      <svg class="header-svg" viewBox="0 0 460 110" preserveAspectRatio="xMidYMid meet">
-        <text id="txt-glow" x="230" y="70" text-anchor="middle"
-              font-family="Inter, sans-serif" font-weight="900"
-              font-size="42" letter-spacing="5"
-              fill="#4fb0e8" opacity="0.35"
-              filter="url(#iceGlow)"></text>
-
-        <text id="txt-3d" x="230" y="68" text-anchor="middle"
-              font-family="Inter, sans-serif" font-weight="900"
-              font-size="42" letter-spacing="5"
-              fill="#0a2a4a" filter="url(#ice3D)"></text>
-
-        <text id="txt-crust" x="230" y="68" text-anchor="middle"
-              font-family="Inter, sans-serif" font-weight="900"
-              font-size="42" letter-spacing="5"
-              fill="#0a2a4a" filter="url(#iceCrust)"></text>
-
-        <text id="txt-main" x="230" y="65" text-anchor="middle"
-              font-family="Inter, sans-serif" font-weight="900"
-              font-size="42" letter-spacing="5"
-              fill="url(#iceGrad)"
-              stroke="#1a4d7a" stroke-width="0.6"
-              filter="url(#frostTop)"></text>
-
-        <text id="txt-shine" x="230" y="65" text-anchor="middle"
-              font-family="Inter, sans-serif" font-weight="900"
-              font-size="42" letter-spacing="5"
-              fill="none"
-              stroke="rgba(255,255,255,0.55)" stroke-width="0.6"
-              stroke-dasharray="2 240"></text>
-
-        <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
-          <path d="M 60,52 q 1,4 0,9 q 3,-4 4,-9 z"/>
-          <path d="M 90,52 q 1,4 0,10 q 3,-4 4,-10 z"/>
-          <path d="M 130,52 q 1,5 0,12 q 3,-5 5,-12 z"/>
-          <path d="M 175,52 q 1,4 0,8  q 3,-4 4,-8 z"/>
-          <path d="M 220,52 q 1,4 0,9 q 3,-4 4,-9 z"/>
-          <path d="M 265,52 q 1,4 0,8 q 3,-4 4,-8 z"/>
-          <path d="M 310,52 q 1,5 0,11 q 3,-5 5,-11 z"/>
-          <path d="M 350,52 q 1,3 0,8  q 3,-3 4,-8 z"/>
-          <path d="M 395,52 q 1,4 0,9 q 3,-4 4,-9 z"/>
-        </g>
-
-        <g fill="#c8f0ff" opacity="0.95">
-          <ellipse cx="70"  cy="92" rx="2" ry="3"/>
-          <ellipse cx="150" cy="94" rx="1.6" ry="2.4"/>
-          <ellipse cx="245" cy="92" rx="2.2" ry="3.2"/>
-          <ellipse cx="320" cy="94" rx="1.6" ry="2.4"/>
-          <ellipse cx="400" cy="93" rx="2" ry="3"/>
-        </g>
-
-        <g id="garland">
-          <path d="M 20,22 Q 60,10 100,22 T 180,22 T 260,22 T 340,22 T 420,22"
-                fill="none" stroke="#1a3a5a" stroke-width="1.4" opacity="0.9"/>
-          <path d="M 20,22 Q 60,10 100,22 T 180,22 T 260,22 T 340,22 T 420,22"
-                fill="none" stroke="#4fb0e8" stroke-width="0.6" opacity="0.6"
-                filter="url(#icicleSoft)"/>
-
-          <g id="bulbs">
-            <circle cx="40"  cy="22" r="2.6" fill="#7a3a1a">
-              <animate attributeName="fill" values="#ffb800;#7a3a1a;#ffb800" dur="2s" begin="0s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="80"  cy="17" r="2.6" fill="#7a1a1a">
-              <animate attributeName="fill" values="#ff3b3b;#7a1a1a;#ff3b3b" dur="2s" begin="0.18s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="120" cy="22" r="2.6" fill="#1a5a2a">
-              <animate attributeName="fill" values="#39ff8b;#1a5a2a;#39ff8b" dur="2s" begin="0.36s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="160" cy="17" r="2.6" fill="#1a3a7a">
-              <animate attributeName="fill" values="#4fb0e8;#1a3a7a;#4fb0e8" dur="2s" begin="0.54s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="200" cy="22" r="2.6" fill="#5a1a5a">
-              <animate attributeName="fill" values="#d36bff;#5a1a5a;#d36bff" dur="2s" begin="0.72s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="240" cy="17" r="2.6" fill="#7a3a1a">
-              <animate attributeName="fill" values="#ffb800;#7a3a1a;#ffb800" dur="2s" begin="0.90s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="280" cy="22" r="2.6" fill="#7a1a1a">
-              <animate attributeName="fill" values="#ff3b3b;#7a1a1a;#ff3b3b" dur="2s" begin="1.08s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="320" cy="17" r="2.6" fill="#1a5a2a">
-              <animate attributeName="fill" values="#39ff8b;#1a5a2a;#39ff8b" dur="2s" begin="1.26s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="360" cy="22" r="2.6" fill="#1a3a7a">
-              <animate attributeName="fill" values="#4fb0e8;#1a3a7a;#4fb0e8" dur="2s" begin="1.44s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="400" cy="17" r="2.6" fill="#5a1a5a">
-              <animate attributeName="fill" values="#d36bff;#5a1a5a;#d36bff" dur="2s" begin="1.62s" repeatCount="indefinite"/>
-            </circle>
-            <circle cx="440" cy="22" r="2.6" fill="#7a3a1a">
-              <animate attributeName="fill" values="#ffb800;#7a3a1a;#ffb800" dur="2s" begin="1.80s" repeatCount="indefinite"/>
-            </circle>
-          </g>
-        </g>
-      </svg>
+<!-- NAV -->
+<nav class="nav">
+    <a href="#" class="nav__brand">
+        <span class="nav__brand-dot"></span>
+        TIMOEGOROV
+    </a>
+    <div class="nav__menu">
+        <a href="#menu">Меню</a>
+        <a href="#philosophy">Философия</a>
+        <a href="#booking">Бронь</a>
+        <a href="#contacts">Контакты</a>
     </div>
-  </header>
+    <a href="tel:+74951234567" class="nav__phone">+7 495 123-45-67</a>
+</nav>
 
-  <section class="hero">
-    <svg class="hero-svg" viewBox="0 0 900 320" preserveAspectRatio="xMidYMid meet">
-      <text x="450" y="110" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="86" letter-spacing="-1"
-            fill="#4fb0e8" opacity="0.3"
-            filter="url(#iceGlow)">НОВЫЙ ВЗГЛЯД НА</text>
-
-      <text x="450" y="105" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="86" letter-spacing="-1"
-            fill="#0a2a4a" filter="url(#ice3D)">НОВЫЙ ВЗГЛЯД НА</text>
-
-      <text x="450" y="105" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="86" letter-spacing="-1"
-            fill="#0a2a4a" filter="url(#iceCrust)">НОВЫЙ ВЗГЛЯД НА</text>
-
-      <text x="450" y="100" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="86" letter-spacing="-1"
-            fill="url(#iceGrad)"
-            stroke="#1a4d7a" stroke-width="0.8"
-            filter="url(#frostTop)">НОВЫЙ ВЗГЛЯД НА</text>
-
-      <text x="450" y="100" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="86" letter-spacing="-1"
-            fill="none"
-            stroke="rgba(255,255,255,0.5)" stroke-width="0.8"
-            stroke-dasharray="3 420">НОВЫЙ ВЗГЛЯД НА</text>
-
-      <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
-        <path d="M 160,120 q 2,6 0,16 q 4,-6 6,-16 z"/>
-        <path d="M 220,120 q 2,8 0,20 q 4,-8 6,-20 z"/>
-        <path d="M 300,120 q 2,6 0,14 q 4,-6 5,-14 z"/>
-        <path d="M 380,120 q 2,7 0,18 q 4,-7 6,-18 z"/>
-        <path d="M 460,120 q 2,5 0,13 q 4,-5 5,-13 z"/>
-        <path d="M 540,120 q 2,8 0,19 q 4,-8 6,-19 z"/>
-        <path d="M 630,120 q 2,6 0,15 q 4,-6 5,-15 z"/>
-        <path d="M 720,120 q 2,7 0,17 q 4,-7 6,-17 z"/>
-      </g>
-
-      <g fill="#c8f0ff" opacity="0.95">
-        <ellipse cx="200" cy="150" rx="2.4" ry="3.6"/>
-        <ellipse cx="350" cy="152" rx="2"   ry="3"/>
-        <ellipse cx="500" cy="150" rx="2.6" ry="3.8"/>
-        <ellipse cx="660" cy="151" rx="2.2" ry="3.2"/>
-      </g>
-
-      <text id="games-glow" x="450" y="245" text-anchor="middle"
-            class="games-word" font-style="italic"
-            font-size="96"
-            fill="#4fb0e8" opacity="0.3"
-            filter="url(#iceGlow)"></text>
-      <text id="games-3d" x="450" y="240" text-anchor="middle"
-            class="games-word" font-style="italic"
-            font-size="96"
-            fill="#0a2a4a" filter="url(#ice3D)"></text>
-      <text id="games-main" x="450" y="235" text-anchor="middle"
-            class="games-word" font-style="italic"
-            font-size="96"
-            fill="url(#iceGrad)"
-            stroke="#1a4d7a" stroke-width="0.8"
-            filter="url(#frostTop)"></text>
-
-      <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
-        <path d="M 340,255 q 2,6 0,14 q 4,-6 5,-14 z"/>
-        <path d="M 420,255 q 2,8 0,18 q 4,-8 6,-18 z"/>
-        <path d="M 490,255 q 2,7 0,16 q 4,-7 5,-16 z"/>
-        <path d="M 560,255 q 2,9 0,20 q 4,-9 6,-20 z"/>
-      </g>
-
-      <g fill="#c8f0ff" opacity="0.95">
-        <ellipse cx="380" cy="288" rx="2.4" ry="3.6"/>
-        <ellipse cx="460" cy="290" rx="2"   ry="3"/>
-        <ellipse cx="530" cy="289" rx="2.6" ry="3.8"/>
-      </g>
-    </svg>
-
-    <div class="hero-buttons">
-      <button class="btn-primary" onclick="scrollToGames()">
-        ИГРАТЬ В ИГРЫ
-      </button>
-    </div>
-    <div class="arrow-down" onclick="scrollToGames()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    </div>
-  </section>
-
-  <section class="games-section" id="games">
-    <svg class="section-svg" viewBox="0 0 400 110" preserveAspectRatio="xMinYMid meet">
-      <text x="200" y="65" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="64" letter-spacing="-1"
-            fill="#4fb0e8" opacity="0.3"
-            filter="url(#iceGlow)">ИГРЫ</text>
-      <text x="200" y="60" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="64" letter-spacing="-1"
-            fill="#0a2a4a" filter="url(#ice3D)">ИГРЫ</text>
-      <text x="200" y="60" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="64" letter-spacing="-1"
-            fill="#0a2a4a" filter="url(#iceCrust)">ИГРЫ</text>
-      <text x="200" y="55" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="64" letter-spacing="-1"
-            fill="url(#iceGrad)"
-            stroke="#1a4d7a" stroke-width="0.8"
-            filter="url(#frostTop)">ИГРЫ</text>
-      <text x="200" y="55" text-anchor="middle"
-            font-family="Inter, sans-serif" font-weight="900"
-            font-size="64" letter-spacing="-1"
-            fill="none"
-            stroke="rgba(255,255,255,0.5)" stroke-width="0.8"
-            stroke-dasharray="3 260">ИГРЫ</text>
-
-      <g filter="url(#icicleSoft)" fill="url(#icicleGrad)">
-        <path d="M 90,78 q 2,6 0,14 q 4,-6 5,-14 z"/>
-        <path d="M 150,78 q 2,8 0,18 q 4,-8 6,-18 z"/>
-        <path d="M 220,78 q 2,7 0,16 q 4,-7 5,-16 z"/>
-        <path d="M 290,78 q 2,9 0,20 q 4,-9 6,-20 z"/>
-      </g>
-    </svg>
-
-    <div class="games-grid">
-      <div class="game-card" data-game="pudge">
-        <div class="best-score" data-best="pudge">★ <span>0</span></div>
-        <h3>🪝 PUDGE HOOK</h3>
-        <p>Ты — Pudge. Крюком ловишь ранги Dota 2, проплывающие мимо.</p>
-      </div>
-
-      <div class="game-card" data-game="snake">
-        <div class="best-score" data-best="snake">★ <span>0</span></div>
-        <h3>🐍 ЗМЕЙКА</h3>
-        <p>Классика. Управляй стрелками, собирай еду и не врезайся в себя.</p>
-      </div>
-
-      <div class="game-card" data-game="sapper">
-        <div class="best-score" data-best="sapper">★ <span>0</span></div>
-        <h3>💣 САПЁР</h3>
-        <p>Логическая игра. ЛКМ — открыть, ПКМ — флаг. Найди все мины.</p>
-      </div>
-
-      <div class="game-card" data-game="flappy">
-        <div class="best-score" data-best="flappy">★ <span>0</span></div>
-        <h3>🐦 FLAPPY BIRD</h3>
-        <p>Пролетай между трубами. Тап или пробел — взмах крыльев.</p>
-      </div>
-
-      <div class="game-card" data-game="astro">
-        <div class="best-score" data-best="astro">★ <span>0</span></div>
-        <h3>🚀 КОСМО-ДОДЖ</h3>
-        <p>Уклоняйся от астероидов. Стрелки влево/вправо — движение.</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="modal-overlay" id="gameModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2><span>▶</span> <span id="modalGameTitle">ЗМЕЙКА</span></h2>
-        <button class="close-btn" id="closeModal">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="game-score-bar">
-          <span class="score-label">Счёт</span>
-          <span class="best-in-game" id="bestInGame"></span>
-          <span class="score-value" id="scoreDisplay">0</span>
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <div class="hero__grid">
+            <div class="hero__vertical">EST. MMXXIV // MILANO — MOSCOW</div>
+            <div class="hero__main">
+                <div class="hero__meta">
+                    <span>VOL. I</span>
+                    <span>СЕЗОН 2026</span>
+                    <span>НАПОЛИ — МОСКВА</span>
+                </div>
+                <h1 class="hero__title">
+                    <span class="outline">PIZZA FROM</span>
+                    <span class="accent">EGOROV &amp;</span>
+                    <span class="outline">TIMOSHENKO</span>
+                </h1>
+                <div class="hero__bottom">
+                    <p class="hero__desc">
+                        Мы печём <b>16 пицц</b>. Не больше. Не меньше.
+                        Каждая — авторская, у каждой — свой номер, характер
+                        и температура. Печь на дровах, 480 °C, 90 секунд.
+                    </p>
+                    <div class="hero__stats">
+                        <div class="stat">
+                            <div class="stat__num">48<span class="u">h</span></div>
+                            <div class="stat__label">выдержка теста</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat__num">480<span class="u">°C</span></div>
+                            <div class="stat__label">печь</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat__num">16</div>
+                            <div class="stat__label">пицц</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat__num">90<span class="u">s</span></div>
+                            <div class="stat__label">запекание</div>
+                        </div>
+                    </div>
+                    <div class="hero__scroll">SCROLL ↓</div>
+                </div>
+            </div>
         </div>
-        <canvas id="gameCanvas" width="800" height="400"></canvas>
-        <div class="game-controls">
-          <button class="ctrl-btn" id="restartBtn">⟳ Заново</button>
-          <button class="ctrl-btn" id="pauseBtn">⏸ Пауза</button>
-        </div>
-        <div class="game-hint" id="hintText">Стрелки – управление, R – рестарт</div>
-      </div>
     </div>
-  </div>
-
-  <div id="errorBox"></div>
-
-  <script>
-    window.onerror = function(msg, url, line) {
-      var box = document.getElementById('errorBox');
-      if (box) {
-        box.style.display = 'block';
-        box.textContent = 'ОШИБКА: ' + msg + ' | строка: ' + line;
-      }
-      return false;
-    };
-
-    var TG = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-
-    function tgReady()          { try { TG && TG.ready(); } catch(e){} }
-    function tgExpand()         { try { TG && TG.expand(); } catch(e){} }
-    function tgDisableSwipes()  { try { TG && TG.disableVerticalSwipes && TG.disableVerticalSwipes(); } catch(e){} }
-    function tgSetHeader(c)     { try { TG && TG.setHeaderColor && TG.setHeaderColor(c); } catch(e){} }
-    function tgSetBg(c)         { try { TG && TG.setBackgroundColor && TG.setBackgroundColor(c); } catch(e){} }
-    function tgShowBack(cb)     { try { TG && TG.BackButton && TG.BackButton.show() && TG.BackButton.onClick(cb); } catch(e){} }
-    function tgHideBack()       { try { TG && TG.BackButton && TG.BackButton.hide() && TG.BackButton.offClick(); } catch(e){} }
-
-    function haptic(type) {
-      try {
-        if (!TG || !TG.HapticFeedback) return;
-        if (type === 'light')       TG.HapticFeedback.impactOccurred('light');
-        else if (type === 'medium') TG.HapticFeedback.impactOccurred('medium');
-        else if (type === 'heavy')  TG.HapticFeedback.impactOccurred('heavy');
-        else if (type === 'success')TG.HapticFeedback.notificationOccurred('success');
-        else if (type === 'error')  TG.HapticFeedback.notificationOccurred('error');
-        else if (type === 'warning')TG.HapticFeedback.notificationOccurred('warning');
-        else if (type === 'select') TG.HapticFeedback.selectionChanged();
-      } catch(e) {}
-    }
-
-    function applyTheme() {
-      if (!TG) return;
-      var scheme = (TG.colorScheme === 'light') ? 'light' : 'dark';
-      document.body.classList.toggle('theme-light', scheme === 'light');
-      var bg = scheme === 'light' ? '#f0f4f8' : '#04070d';
-      tgSetHeader(bg);
-      tgSetBg(bg);
-    }
-
-    function updateViewport() {
-      if (!TG) return;
-      var root = document.documentElement;
-      var vh = (TG.viewportStableHeight || window.innerHeight) + 'px';
-      root.style.setProperty('--tg-viewport-height', vh);
-      var safeTop = 0, safeBottom = 0;
-      if (TG.contentSafeAreaInset) {
-        safeTop = TG.contentSafeAreaInset.top || 0;
-        safeBottom = TG.contentSafeAreaInset.bottom || 0;
-      }
-      root.style.setProperty('--tg-safe-top', safeTop + 'px');
-      root.style.setProperty('--tg-safe-bottom', safeBottom + 'px');
-    }
-
-    (function initTelegram() {
-      if (!TG) { console.log('Not in Telegram'); return; }
-      tgReady();
-      tgExpand();
-      tgDisableSwipes();
-      document.body.classList.add('tg-webapp');
-      applyTheme();
-      updateViewport();
-      TG.onEvent('themeChanged', applyTheme);
-      TG.onEvent('viewportChanged', updateViewport);
-      console.log('Telegram WebApp OK | platform:', TG.platform);
-    })();
-
-    (function svgTypewriter() {
-      var ids = ['txt-glow', 'txt-3d', 'txt-crust', 'txt-main', 'txt-shine'];
-      var fullText = 'CULT1338';
-      var index = 0;
-      var state = 'typing';
-
-      var nodes = ids.map(function(id) { return document.getElementById(id); }).filter(Boolean);
-      if (nodes.length === 0) return;
-
-      function setText(s) {
-        nodes.forEach(function(n) { n.textContent = s; });
-      }
-
-      function tick() {
-        if (state === 'typing') {
-          index++;
-          setText(fullText.slice(0, index));
-          if (index >= fullText.length) {
-            state = 'waiting';
-            setTimeout(function() { state = 'deleting'; tick(); }, 10000);
-            return;
-          }
-          setTimeout(tick, 180);
-        } else if (state === 'deleting') {
-          index--;
-          setText(fullText.slice(0, index));
-          if (index <= 0) {
-            state = 'pausing';
-            setTimeout(function() { state = 'typing'; tick(); }, 500);
-            return;
-          }
-          setTimeout(tick, 80);
-        }
-      }
-      setTimeout(tick, 300);
-    })();
-
-    // ============================================================
-    // ПЕЧАТНАЯ МАШИНКА ДЛЯ СЛОВА «ИГРЫ» + СМЕНА ШРИФТА
-    // ============================================================
-    (function gamesTypewriter() {
-      var FONTS = [
-        "'Playfair Display', serif",
-        "'Lobster', cursive",
-        "'Press Start 2P', monospace",
-        "'Caveat', cursive",
-        "'Bebas Neue', sans-serif",
-        "'Great Vibes', cursive",
-        "'Russo One', sans-serif",
-        "'Pacifico', cursive",
-        "'Marck Script', cursive",
-        "'Bad Script', cursive"
-      ];
-
-      var nodes = [
-        document.getElementById('games-glow'),
-        document.getElementById('games-3d'),
-        document.getElementById('games-main')
-      ].filter(Boolean);
-
-      if (nodes.length === 0) {
-        console.log('gamesTypewriter: элементы «игры» не найдены');
-        return;
-      }
-
-      var FULL_WORD = 'игры';
-
-      var TYPE_DELAY   = 180;
-      var DELETE_DELAY = 120;
-      var HOLD_FULL    = 1800;
-      var HOLD_EMPTY   = 300;
-
-      var index = 0;
-      var fontIndex = Math.floor(Math.random() * FONTS.length);
-      var phase = 'typing';
-
-      function setText(s) {
-        nodes.forEach(function(n) { n.textContent = s; });
-      }
-
-      function applyFont(font) {
-        nodes.forEach(function(n) { n.setAttribute('font-family', font); });
-      }
-
-      applyFont(FONTS[fontIndex]);
-      setText('');
-
-      function tick() {
-        if (phase === 'typing') {
-          if (index < FULL_WORD.length) {
-            index++;
-            setText(FULL_WORD.slice(0, index));
-            setTimeout(tick, TYPE_DELAY);
-          } else {
-            phase = 'holdFull';
-            setTimeout(tick, HOLD_FULL);
-          }
-        } else if (phase === 'holdFull') {
-          phase = 'deleting';
-          tick();
-        } else if (phase === 'deleting') {
-          if (index > 0) {
-            index--;
-            setText(FULL_WORD.slice(0, index));
-            setTimeout(tick, DELETE_DELAY);
-          } else {
-            fontIndex = (fontIndex + 1) % FONTS.length;
-            applyFont(FONTS[fontIndex]);
-            phase = 'holdEmpty';
-            setTimeout(tick, HOLD_EMPTY);
-          }
-        } else if (phase === 'holdEmpty') {
-          phase = 'typing';
-          tick();
-        }
-      }
-
-      setTimeout(tick, 800);
-    })();
-
-    var BestScores = {
-      cache: { snake: 0, sapper: 0, flappy: 0, astro: 0, pudge: 0 },
-      loaded: false,
-
-      load: function(callback) {
-        var self = this;
-        var keys = ['best_snake', 'best_sapper', 'best_flappy', 'best_astro', 'best_pudge'];
-        if (TG && TG.CloudStorage) {
-          TG.CloudStorage.getItems(keys, function(err, values) {
-            if (!err && values) {
-              self.cache.snake  = parseInt(values.best_snake  || 0, 10) || 0;
-              self.cache.sapper = parseInt(values.best_sapper || 0, 10) || 0;
-              self.cache.flappy = parseInt(values.best_flappy || 0, 10) || 0;
-              self.cache.astro  = parseInt(values.best_astro  || 0, 10) || 0;
-              self.cache.pudge  = parseInt(values.best_pudge  || 0, 10) || 0;
-            }
-            self.loaded = true;
-            callback && callback();
-          });
-        } else {
-          try {
-            self.cache.snake  = parseInt(localStorage.getItem('best_snake')  || 0, 10) || 0;
-            self.cache.sapper = parseInt(localStorage.getItem('best_sapper') || 0, 10) || 0;
-            self.cache.flappy = parseInt(localStorage.getItem('best_flappy') || 0, 10) || 0;
-            self.cache.astro  = parseInt(localStorage.getItem('best_astro')  || 0, 10) || 0;
-            self.cache.pudge  = parseInt(localStorage.getItem('best_pudge')  || 0, 10) || 0;
-          } catch(e) {}
-          self.loaded = true;
-          callback && callback();
-        }
-      },
-
-      update: function(game, score) {
-        if (score <= (this.cache[game] || 0)) return false;
-        this.cache[game] = score;
-        var key = 'best_' + game;
-        if (TG && TG.CloudStorage) {
-          TG.CloudStorage.setItem(key, String(score), function(){});
-        } else {
-          try { localStorage.setItem(key, String(score)); } catch(e) {}
-        }
-        this.render();
-        return true;
-      },
-
-      render: function() {
-        var self = this;
-        ['snake', 'sapper', 'flappy', 'astro', 'pudge'].forEach(function(g) {
-          var el = document.querySelector('[data-best="' + g + '"]');
-          if (!el) return;
-          var val = self.cache[g] || 0;
-          if (val > 0) {
-            el.classList.add('visible');
-            el.querySelector('span').textContent = val;
-          } else {
-            el.classList.remove('visible');
-          }
-        });
-      },
-    };
-
-    BestScores.load(function() {
-      BestScores.render();
-      console.log('Best scores:', BestScores.cache);
-    });
-
-    function scrollToGames() {
-      haptic('light');
-      document.getElementById('games').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    (function() {
-      if (typeof CanvasRenderingContext2D !== 'undefined' &&
-          !CanvasRenderingContext2D.prototype.roundRect) {
-        CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-          if (typeof r === 'number') r = [r, r, r, r];
-          else if (!Array.isArray(r)) r = [0, 0, 0, 0];
-          else if (r.length === 1) r = [r[0], r[0], r[0], r[0]];
-          else if (r.length === 2) r = [r[0], r[1], r[0], r[1]];
-          else if (r.length === 3) r = [r[0], r[1], r[2], r[1]];
-          var tl = r[0], tr = r[1], br = r[2], bl = r[3];
-          this.moveTo(x + tl, y);
-          this.lineTo(x + w - tr, y);
-          this.quadraticCurveTo(x + w, y, x + w, y + tr);
-          this.lineTo(x + w, y + h - br);
-          this.quadraticCurveTo(x + w, y + h, x + w - br, y + h);
-          this.lineTo(x + bl, y + h);
-          this.quadraticCurveTo(x, y + h, x, y + h - bl);
-          this.lineTo(x, y + tl);
-          this.quadraticCurveTo(x, y, x + tl, y);
-          this.closePath();
-          return this;
-        };
-      }
-    })();
-
-    (function snowAnimation() {
-      var canvas = document.getElementById('snowCanvas');
-      var ctx = canvas.getContext('2d');
-      var width, height, snowflakes = [];
-      var SNOW_COUNT = 120;
-
-      function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      function createSnowflake() {
-        return {
-          x: Math.random() * width,
-          y: Math.random() * height - height,
-          radius: Math.random() * 2.5 + 0.5,
-          speed: Math.random() * 1.2 + 0.4,
-          drift: Math.random() * 0.6 - 0.3,
-          opacity: Math.random() * 0.6 + 0.3,
-          wobble: Math.random() * Math.PI * 2,
-          wobbleSpeed: Math.random() * 0.02 + 0.005
-        };
-      }
-
-      for (var i = 0; i < SNOW_COUNT; i++) {
-        var flake = createSnowflake();
-        flake.y = Math.random() * height;
-        snowflakes.push(flake);
-      }
-
-      function draw() {
-        ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = '#ffffff';
-        for (var i = 0; i < snowflakes.length; i++) {
-          var flake = snowflakes[i];
-          flake.wobble += flake.wobbleSpeed;
-          flake.x += Math.sin(flake.wobble) * 0.5 + flake.drift;
-          flake.y += flake.speed;
-          if (flake.y > height + 10) {
-            snowflakes[i] = createSnowflake();
-            snowflakes[i].y = -10;
-          }
-          if (flake.x > width + 10) flake.x = -10;
-          if (flake.x < -10) flake.x = width + 10;
-          ctx.globalAlpha = flake.opacity;
-          ctx.beginPath();
-          ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-          ctx.fill();
-          if (flake.radius > 1.8) {
-            ctx.globalAlpha = flake.opacity * 0.3;
-            ctx.beginPath();
-            ctx.arc(flake.x, flake.y, flake.radius * 2.5, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(draw);
-      }
-      draw();
-    })();
-
-    // ============================================================
-    // ИГРОВОЙ ДВИЖОК + PUDGE HOOK
-    // ============================================================
-    (function() {
-      var canvas = document.getElementById('gameCanvas');
-      var ctx = canvas.getContext('2d');
-      var scoreDisplay = document.getElementById('scoreDisplay');
-      var bestInGame = document.getElementById('bestInGame');
-      var modalGameTitle = document.getElementById('modalGameTitle');
-      var hintText = document.getElementById('hintText');
-      var modal = document.getElementById('gameModal');
-
-      var currentGame = 'snake';
-      var score = 0;
-      var isPaused = false;
-      var gameOver = false;
-      var animationFrame = null;
-
-      var lastFrameTime = 0;
-      var logicAccumulator = 0;
-      var LOGIC_STEP = 1 / 60;
-      var MAX_FRAME = 0.1;
-
-      var snake = { body: [], dir: 'right', nextDir: 'right', food: {x:10,y:10} };
-      var COLS = 40, ROWS = 20, CELL = 20;
-      var SNAKE_SPEED = 8;
-      var snakeTimer = 0;
-
-      var sapperGrid = [], sapperRevealed = [], sapperFlags = [];
-      var sapperGameOver = false, sapperWin = false;
-      var SAPPER_COLS = 16, SAPPER_ROWS = 8, SAPPER_MINES = 12;
-
-      var flappyBird = { y: 200, vy: 0, radius: 15 };
-      var flappyPipes = [], flappyScore = 0, flappyGameOver = false;
-      var FLAPPY_GRAVITY = 25;
-      var FLAPPY_JUMP = -8.0;
-      var FLAPPY_PIPE_WIDTH = 55;
-      var FLAPPY_PIPE_GAP = 130;
-      var FLAPPY_PIPE_SPEED = 3.0;
-
-      var astroPlayer = { x: 385, y: 350, width: 30, height: 30 };
-      var astroObstacles = [], astroScore = 0, astroGameOver = false;
-      var ASTRO_SPEED = 6;
-      var ASTRO_FALL = 4;
-      var ASTRO_SPAWN_EVERY = 0.5;
-      var astroSpawnTimer = 0;
-      var ASTRO_OBS_WIDTH = 35;
-      var ASTRO_OBS_HEIGHT = 35;
-
-      var pudge = { x: 80, y: 340, radius: 22 };
-      var hook = {
-        x: 80, y: 340, originX: 80, originY: 340,
-        vx: 0, vy: 0, state: 'idle', length: 0,
-        maxLength: 700, speed: 11
-      };
-      var pudgeTargets = [];
-      var pudgeScore = 0;
-      var pudgeMisses = 0;
-      var pudgeGameOver = false;
-      var PUDGE_MAX_MISSES = 5;
-      var PUDGE_TARGETS_BASE = 4;
-      var pudgeSpawnTimer = 0;
-      var pudgeSpawnEvery = 1.4;
-
-      var DOTA_RANKS = [
-        { key: 'herald',   svgId: 'rank-herald',   img: null },
-        { key: 'guardian', svgId: 'rank-guardian', img: null },
-        { key: 'crusader', svgId: 'rank-crusader', img: null },
-        { key: 'archon',   svgId: 'rank-archon',   img: null },
-        { key: 'legend',   svgId: 'rank-legend',   img: null },
-        { key: 'ancient',  svgId: 'rank-ancient',  img: null },
-        { key: 'divine',   svgId: 'rank-divine',   img: null },
-        { key: 'immortal', svgId: 'rank-immortal', img: null }
-      ];
-
-      (function preloadRankImages() {
-        for (var i = 0; i < DOTA_RANKS.length; i++) {
-          var rank = DOTA_RANKS[i];
-          var sym = document.getElementById(rank.svgId);
-          if (!sym) continue;
-          var svgString =
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">'
-            + sym.innerHTML
-            + '</svg>';
-          var encoded = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
-          var img = new Image();
-          img.src = encoded;
-          rank.img = img;
-        }
-      })();
-
-      var keys = {};
-
-      function initPudge() {
-        pudge.x = 80; pudge.y = 340;
-        hook.x = pudge.x; hook.y = pudge.y;
-        hook.originX = pudge.x; hook.originY = pudge.y;
-        hook.state = 'idle'; hook.length = 0; hook.vx = 0; hook.vy = 0;
-        pudgeTargets = [];
-        pudgeScore = 0;
-        pudgeMisses = 0;
-        pudgeGameOver = false;
-        pudgeSpawnTimer = 0;
-        pudgeSpawnEvery = 1.4;
-        isPaused = false;
-        updateScoreDisplay(0);
-        hintText.textContent = 'Веди мышкой / тапай, чтобы целиться, клик — хук';
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-        updateBestInGame();
-        for (var i = 0; i < PUDGE_TARGETS_BASE; i++) {
-          spawnPudgeTarget();
-        }
-      }
-
-      function spawnPudgeTarget() {
-        var laneY = 80 + Math.random() * 220;
-        var speed = 1.2 + Math.random() * 1.2 + pudgeScore * 0.05;
-        var dir = Math.random() < 0.5 ? 1 : -1;
-        var rank = DOTA_RANKS[Math.floor(Math.random() * DOTA_RANKS.length)];
-        var startX = dir > 0 ? -40 : canvas.width + 40;
-        pudgeTargets.push({
-          x: startX,
-          y: laneY,
-          vx: dir * speed,
-          w: 34, h: 34,
-          rank: rank,
-          wobble: Math.random() * Math.PI * 2
-        });
-      }
-
-      function launchHook(targetX, targetY) {
-        if (hook.state !== 'idle' || pudgeGameOver || isPaused) return;
-        var dx = targetX - pudge.x;
-        var dy = targetY - pudge.y;
-        var len = Math.sqrt(dx * dx + dy * dy) || 1;
-        hook.vx = dx / len * hook.speed;
-        hook.vy = dy / len * hook.speed;
-        hook.x = pudge.x; hook.y = pudge.y;
-        hook.length = 0;
-        hook.state = 'flying';
-        haptic('medium');
-      }
-
-      function updatePudge(dt) {
-        if (pudgeGameOver || isPaused) return;
-
-        var speedMul = 1 + pudgeScore * 0.03;
-        for (var i = pudgeTargets.length - 1; i >= 0; i--) {
-          var t = pudgeTargets[i];
-          t.x += t.vx * speedMul;
-          t.wobble += dt * 4;
-          if (t.x < -60 || t.x > canvas.width + 60) pudgeTargets.splice(i, 1);
-        }
-
-        pudgeSpawnTimer += dt;
-        if (pudgeSpawnTimer >= pudgeSpawnEvery && pudgeTargets.length < 7) {
-          pudgeSpawnTimer = 0;
-          spawnPudgeTarget();
-          pudgeSpawnEvery = Math.max(0.7, 1.4 - pudgeScore * 0.03);
-        }
-
-        if (hook.state === 'flying') {
-          hook.x += hook.vx;
-          hook.y += hook.vy;
-          var ox = hook.x - pudge.x, oy = hook.y - pudge.y;
-          hook.length = Math.sqrt(ox * ox + oy * oy);
-
-          for (var i = 0; i < pudgeTargets.length; i++) {
-            var t = pudgeTargets[i];
-            var dx = hook.x - t.x, dy = hook.y - t.y;
-            if (Math.sqrt(dx * dx + dy * dy) < 26) {
-              t.caught = true;
-              hook.state = 'returning';
-              pudgeMisses = 0;
-              haptic('success');
-              break;
-            }
-          }
-
-          if (hook.length > hook.maxLength ||
-              hook.x < 0 || hook.x > canvas.width ||
-              hook.y < 0 || hook.y > canvas.height) {
-            hook.state = 'returning';
-          }
-        }
-
-        if (hook.state === 'returning') {
-          var dx = pudge.x - hook.x, dy = pudge.y - hook.y;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < hook.speed) {
-            hook.x = pudge.x; hook.y = pudge.y;
-            hook.state = 'idle'; hook.length = 0;
-            var caughtAny = false;
-            for (var i = 0; i < pudgeTargets.length; i++) {
-              if (pudgeTargets[i].caught) { caughtAny = true; break; }
-            }
-            if (!caughtAny) {
-              pudgeMisses++;
-              haptic('warning');
-              if (pudgeMisses >= PUDGE_MAX_MISSES) {
-                pudgeGameOver = true;
-                saveScoreIfGameOver('pudge', pudgeScore);
-                haptic('error');
-              }
-            }
-          } else {
-            hook.x += dx / dist * hook.speed * 1.4;
-            hook.y += dy / dist * hook.speed * 1.4;
-          }
-        }
-
-        for (var i = pudgeTargets.length - 1; i >= 0; i--) {
-          var t = pudgeTargets[i];
-          if (t.caught) {
-            var dx = pudge.x - t.x, dy = pudge.y - t.y;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 25) {
-              pudgeTargets.splice(i, 1);
-              pudgeScore++;
-              updateScoreDisplay(pudgeScore);
-              haptic('light');
-            } else {
-              t.x += dx / dist * 8;
-              t.y += dy / dist * 8;
-            }
-          }
-        }
-      }
-
-      function drawPudge() {
-        var bg = document.body.classList.contains('theme-light') ? '#0f2538' : '#0a1a2a';
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        var groundGrad = ctx.createLinearGradient(0, canvas.height - 60, 0, canvas.height);
-        groundGrad.addColorStop(0, 'rgba(60, 120, 80, 0.4)');
-        groundGrad.addColorStop(1, 'rgba(30, 70, 40, 0.7)');
-        ctx.fillStyle = groundGrad;
-        ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
-
-        ctx.strokeStyle = 'rgba(120, 200, 255, 0.08)';
-        ctx.lineWidth = 1;
-        for (var i = 1; i <= 3; i++) {
-          ctx.beginPath();
-          ctx.moveTo(0, 80 + i * 70);
-          ctx.lineTo(canvas.width, 80 + i * 70);
-          ctx.stroke();
-        }
-
-        for (var i = 0; i < pudgeTargets.length; i++) drawPudgeTarget(pudgeTargets[i]);
-
-        if (hook.state !== 'idle') {
-          ctx.strokeStyle = '#8b6b4a';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(pudge.x, pudge.y);
-          ctx.lineTo(hook.x, hook.y);
-          ctx.stroke();
-
-          ctx.fillStyle = '#c0c0c0';
-          ctx.shadowColor = '#ffffff';
-          ctx.shadowBlur = 10;
-          ctx.beginPath();
-          ctx.arc(hook.x, hook.y, 8, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = '#707070';
-          ctx.beginPath();
-          ctx.arc(hook.x - 2, hook.y - 2, 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        drawPudgeCharacter(pudge.x, pudge.y);
-
-        for (var i = 0; i < PUDGE_MAX_MISSES; i++) {
-          ctx.fillStyle = i < pudgeMisses ? '#ff3b3b' : 'rgba(255, 59, 59, 0.2)';
-          ctx.beginPath();
-          ctx.arc(20 + i * 16, 20, 5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        if (pudgeGameOver) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.font = 'bold 44px "Inter", sans-serif';
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = '#ff0000';
-          ctx.shadowBlur = 25;
-          ctx.textAlign = 'center';
-          ctx.fillText('МЯСО ГОТОВО', canvas.width / 2, canvas.height / 2);
-          ctx.font = 'bold 20px "Inter", sans-serif';
-          ctx.fillStyle = '#ffb800';
-          ctx.fillText('Счёт: ' + pudgeScore, canvas.width / 2, canvas.height / 2 + 40);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
-        }
-        if (isPaused) {
-          ctx.font = 'bold 36px "Inter", sans-serif';
-          ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff';
-          ctx.shadowBlur = 25;
-          ctx.textAlign = 'center';
-          ctx.fillText('ПАУЗА', canvas.width / 2, canvas.height / 2);
-          ctx.shadowBlur = 0;
-          ctx.textAlign = 'start';
-        }
-      }
-
-      function drawPudgeTarget(t) {
-        ctx.save();
-        ctx.translate(t.x, t.y);
-        ctx.rotate(Math.sin(t.wobble) * 0.08);
-
-        var r = t.rank;
-        var size = t.w;
-
-        if (r.img && r.img.complete && r.img.naturalWidth) {
-          ctx.shadowColor = 'rgba(120, 200, 255, 0.55)';
-          ctx.shadowBlur = 10;
-          ctx.drawImage(r.img, -size / 2, -size / 2, size, size);
-          ctx.shadowBlur = 0;
-        } else {
-          ctx.fillStyle = 'rgba(120, 200, 255, 0.4)';
-          ctx.beginPath();
-          ctx.arc(0, 0, size / 2 - 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        ctx.restore();
-      }
-
-      function drawPudgeCharacter(x, y) {
-        ctx.save();
-        ctx.translate(x, y);
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.beginPath();
-        ctx.ellipse(0, 20, 28, 8, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.shadowColor = '#2a6a3a';
-        ctx.shadowBlur = 15;
-        ctx.fillStyle = '#3d8b4a';
-        ctx.beginPath();
-        ctx.ellipse(0, 5, 26, 24, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        ctx.fillStyle = '#5da86a';
-        ctx.beginPath();
-        ctx.ellipse(0, 10, 16, 14, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(-8, -8, 5, 0, Math.PI * 2);
-        ctx.arc(8, -8, 5, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.arc(-6, -7, 2.5, 0, Math.PI * 2);
-        ctx.arc(10, -7, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#8b2a2a';
-        ctx.beginPath();
-        ctx.arc(-14, 5, 2, 0, Math.PI * 2);
-        ctx.arc(14, 8, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-      }
-
-      function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-      function updateScoreDisplay(val) { score = val; scoreDisplay.textContent = val; }
-
-      function updateBestInGame() {
-        var b = BestScores.cache[currentGame] || 0;
-        bestInGame.textContent = b > 0 ? '★ Лучший: ' + b : '';
-      }
-
-      function stopAllIntervals() {
-        if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
-        lastFrameTime = 0;
-        logicAccumulator = 0;
-      }
-
-      function stopCurrentGame() {
-        stopAllIntervals();
-        isPaused = false;
-        gameOver = false;
-        var pb = document.getElementById('pauseBtn');
-        if (pb) pb.textContent = '⏸ Пауза';
-      }
-
-      function saveScoreIfGameOver(game, sc) {
-        if (sc > 0 && BestScores.update(game, sc)) {
-          haptic('success');
-          updateBestInGame();
-        }
-      }
-
-      function initSnake() {
-        snake.body = [{x: 10, y: 10},{x: 9, y: 10},{x: 8, y: 10}];
-        snake.dir = 'right'; snake.nextDir = 'right';
-        snakeTimer = 0;
-        generateSnakeFood();
-        updateScoreDisplay(0);
-        gameOver = false; isPaused = false;
-        hintText.textContent = 'Стрелки – управление, R – рестарт';
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-        updateBestInGame();
-      }
-
-      function generateSnakeFood() {
-        var free = [];
-        for (var i = 0; i < COLS; i++) for (var j = 0; j < ROWS; j++) {
-          var occ = false;
-          for (var k = 0; k < snake.body.length; k++) {
-            if (snake.body[k].x === i && snake.body[k].y === j) { occ = true; break; }
-          }
-          if (!occ) free.push({x: i, y: j});
-        }
-        if (free.length === 0) return;
-        snake.food = free[Math.floor(Math.random() * free.length)];
-      }
-
-      function initSapper() {
-        sapperGrid = []; sapperRevealed = []; sapperFlags = [];
-        for (var r = 0; r < SAPPER_ROWS; r++) {
-          sapperGrid[r] = []; sapperRevealed[r] = []; sapperFlags[r] = [];
-          for (var c = 0; c < SAPPER_COLS; c++) {
-            sapperGrid[r][c] = 0; sapperRevealed[r][c] = false; sapperFlags[r][c] = false;
-          }
-        }
-        sapperGameOver = false; sapperWin = false;
-        var placed = 0;
-        while (placed < SAPPER_MINES) {
-          var r = Math.floor(Math.random() * SAPPER_ROWS);
-          var c = Math.floor(Math.random() * SAPPER_COLS);
-          if (sapperGrid[r][c] !== -1) { sapperGrid[r][c] = -1; placed++; }
-        }
-        for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
-          if (sapperGrid[r][c] === -1) continue;
-          var cnt = 0;
-          for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
-            var nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < SAPPER_ROWS && nc >= 0 && nc < SAPPER_COLS && sapperGrid[nr][nc] === -1) cnt++;
-          }
-          sapperGrid[r][c] = cnt;
-        }
-        updateScoreDisplay(0);
-        hintText.textContent = 'Тап – открыть, долгий тап – флаг';
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-        updateBestInGame();
-      }
-
-      function initFlappy() {
-        flappyBird = { y: 200, vy: 0, radius: 15 };
-        flappyPipes = []; flappyScore = 0; flappyGameOver = false; isPaused = false;
-        updateScoreDisplay(0);
-        hintText.textContent = 'Тап / пробел – взмах';
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-        for (var i = 0; i < 3; i++) {
-          flappyPipes.push({ x: 700 + i * 250, top: 100 + Math.random() * 150, passed: false });
-        }
-        updateBestInGame();
-      }
-
-      function initAstro() {
-        astroPlayer = { x: 385, y: 350, width: 30, height: 30 };
-        astroObstacles = []; astroScore = 0; astroGameOver = false; astroSpawnTimer = 0;
-        isPaused = false;
-        updateScoreDisplay(0);
-        hintText.textContent = '← → – движение (или тап слева/справа)';
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-        updateBestInGame();
-      }
-
-      function bgColor() { return document.body.classList.contains('theme-light') ? '#dfe8f2' : '#0a0f18'; }
-      function gridColor() { return document.body.classList.contains('theme-light') ? '#c0d0e0' : '#1e2a3a'; }
-
-      function drawSnake() {
-        ctx.fillStyle = bgColor(); ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = gridColor(); ctx.lineWidth = 0.5;
-        for (var i = 0; i <= COLS; i++) { ctx.beginPath(); ctx.moveTo(i * CELL, 0); ctx.lineTo(i * CELL, canvas.height); ctx.stroke(); }
-        for (var i = 0; i <= ROWS; i++) { ctx.beginPath(); ctx.moveTo(0, i * CELL); ctx.lineTo(canvas.width, i * CELL); ctx.stroke(); }
-
-        ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 18; ctx.fillStyle = '#ff4d6d';
-        ctx.beginPath();
-        ctx.arc(snake.food.x * CELL + CELL/2, snake.food.y * CELL + CELL/2, CELL/2 - 2, 0, Math.PI*2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        for (var i = 0; i < snake.body.length; i++) {
-          var seg = snake.body[i];
-          var gradient = ctx.createRadialGradient(seg.x*CELL+4, seg.y*CELL+4, 2, seg.x*CELL+10, seg.y*CELL+10, 16);
-          if (i === 0) { gradient.addColorStop(0, '#b0f0ff'); gradient.addColorStop(1, '#3b82f6'); }
-          else { gradient.addColorStop(0, '#6ea8ff'); gradient.addColorStop(1, '#1e40af'); }
-          ctx.fillStyle = gradient;
-          ctx.shadowColor = i === 0 ? '#00ffff' : '#2563eb';
-          ctx.shadowBlur = i === 0 ? 18 : 10;
-          ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
-        }
-        ctx.shadowBlur = 0;
-
-        if (gameOver) {
-          ctx.font = 'bold 40px "Inter", sans-serif';
-          ctx.fillStyle = '#ffffffdd'; ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20;
-          ctx.textAlign = 'center'; ctx.fillText('ИГРА ОКОНЧЕНА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-        if (isPaused) {
-          ctx.font = 'bold 36px "Inter", sans-serif';
-          ctx.fillStyle = '#ffffffcc'; ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25;
-          ctx.textAlign = 'center'; ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-      }
-
-      function drawSapper() {
-        ctx.fillStyle = bgColor(); ctx.fillRect(0, 0, canvas.width, canvas.height);
-        var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-        for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
-          var x = c * cellW, y = r * cellH;
-          if (sapperRevealed[r][c]) {
-            ctx.fillStyle = document.body.classList.contains('theme-light') ? '#c8d8e8' : '#1e2a3f';
-            ctx.fillRect(x, y, cellW-2, cellH-2);
-            if (sapperGrid[r][c] === -1) {
-              ctx.font = (cellH*0.7) + 'px "Inter"'; ctx.fillStyle = '#ff4d6d';
-              ctx.textAlign = 'center'; ctx.fillText('💣', x + cellW/2, y + cellH*0.7); ctx.textAlign = 'start';
-            } else if (sapperGrid[r][c] > 0) {
-              ctx.font = 'bold ' + (cellH*0.6) + 'px "Inter"'; ctx.fillStyle = '#2a90c8';
-              ctx.textAlign = 'center'; ctx.fillText(sapperGrid[r][c], x + cellW/2, y + cellH*0.7); ctx.textAlign = 'start';
-            }
-          } else {
-            ctx.fillStyle = sapperFlags[r][c] ? '#2a3a5a' : (document.body.classList.contains('theme-light') ? '#a8b8c8' : '#141e2c');
-            ctx.fillRect(x, y, cellW-2, cellH-2);
-            if (sapperFlags[r][c]) {
-              ctx.font = (cellH*0.6) + 'px "Inter"'; ctx.fillStyle = '#7fd4ff';
-              ctx.textAlign = 'center'; ctx.fillText('⚑', x + cellW/2, y + cellH*0.7); ctx.textAlign = 'start';
-            }
-          }
-          ctx.strokeStyle = '#2f405a'; ctx.strokeRect(x, y, cellW-2, cellH-2);
-        }
-        if (sapperGameOver) {
-          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ff8888';
-          ctx.shadowBlur = 20; ctx.shadowColor = 'red'; ctx.textAlign = 'center';
-          ctx.fillText('💥 БУМ!', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        } else if (sapperWin) {
-          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#a0ffb0';
-          ctx.shadowBlur = 20; ctx.shadowColor = '#00ff88'; ctx.textAlign = 'center';
-          ctx.fillText('ПОБЕДА!', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-        if (isPaused) {
-          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.textAlign = 'center';
-          ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-      }
-
-      function drawFlappy() {
-        var grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        if (document.body.classList.contains('theme-light')) {
-          grad.addColorStop(0, '#c8dcf0'); grad.addColorStop(1, '#a8c0d8');
-        } else {
-          grad.addColorStop(0, '#0b1424'); grad.addColorStop(1, '#1a2a3a');
-        }
-        ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.shadowBlur = 20; ctx.shadowColor = '#3b82f6';
-        for (var i = 0; i < flappyPipes.length; i++) {
-          var pipe = flappyPipes[i];
-          ctx.fillStyle = '#2d4b6e';
-          ctx.fillRect(pipe.x, 0, FLAPPY_PIPE_WIDTH, pipe.top);
-          ctx.fillRect(pipe.x, pipe.top + FLAPPY_PIPE_GAP, FLAPPY_PIPE_WIDTH, canvas.height - (pipe.top + FLAPPY_PIPE_GAP));
-          ctx.fillStyle = '#5f8ec9';
-          ctx.fillRect(pipe.x + 5, 0, 8, pipe.top);
-          ctx.fillRect(pipe.x + 5, pipe.top + FLAPPY_PIPE_GAP, 8, canvas.height - (pipe.top + FLAPPY_PIPE_GAP));
-        }
-        ctx.shadowBlur = 0;
-        ctx.shadowBlur = 24; ctx.shadowColor = '#fbbf24'; ctx.fillStyle = '#fbbf24';
-        ctx.beginPath(); ctx.arc(150, flappyBird.y, flappyBird.radius, 0, Math.PI*2); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(155, flappyBird.y-4, 4, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(156, flappyBird.y-5, 2, 0, Math.PI*2); ctx.fill();
-
-        if (flappyGameOver) {
-          ctx.font = 'bold 40px "Inter"'; ctx.fillStyle = '#ffffffdd';
-          ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.textAlign = 'center';
-          ctx.fillText('УПАЛ...', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-        if (isPaused) {
-          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.textAlign = 'center';
-          ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-      }
-
-      function drawAstro() {
-        ctx.fillStyle = document.body.classList.contains('theme-light') ? '#e8eef6' : '#05080f';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        for (var i = 0; i < 60; i++) {
-          ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + Math.random()*0.5) + ')';
-          ctx.beginPath(); ctx.arc((i*137)%800, (i*253)%400, 1.5, 0, Math.PI*2); ctx.fill();
-        }
-        ctx.shadowBlur = 28; ctx.shadowColor = '#00ffff'; ctx.fillStyle = '#a0e0ff';
-        ctx.beginPath(); ctx.roundRect(astroPlayer.x, astroPlayer.y, astroPlayer.width, astroPlayer.height, 8); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.shadowBlur = 20; ctx.shadowColor = '#ff3366';
-        for (var i = 0; i < astroObstacles.length; i++) {
-          var obs = astroObstacles[i];
-          ctx.fillStyle = '#ff4d6d';
-          ctx.beginPath(); ctx.roundRect(obs.x, obs.y, obs.w, obs.h, 8); ctx.fill();
-        }
-        ctx.shadowBlur = 0;
-        if (astroGameOver) {
-          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffdd';
-          ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 20; ctx.textAlign = 'center';
-          ctx.fillText('СТОЛКНОВЕНИЕ', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-        if (isPaused) {
-          ctx.font = 'bold 36px "Inter"'; ctx.fillStyle = '#ffffffcc';
-          ctx.shadowColor = '#7fd4ff'; ctx.shadowBlur = 25; ctx.textAlign = 'center';
-          ctx.fillText('ПАУЗА', canvas.width/2, canvas.height/2);
-          ctx.shadowBlur = 0; ctx.textAlign = 'start';
-        }
-      }
-
-      function stepSnake() {
-        if (gameOver || isPaused) return;
-        if (snake.nextDir === 'up' && snake.dir !== 'down') snake.dir = 'up';
-        else if (snake.nextDir === 'down' && snake.dir !== 'up') snake.dir = 'down';
-        else if (snake.nextDir === 'left' && snake.dir !== 'right') snake.dir = 'left';
-        else if (snake.nextDir === 'right' && snake.dir !== 'left') snake.dir = 'right';
-
-        var head = snake.body[0], newHead = { x: head.x, y: head.y };
-        if (snake.dir === 'right') newHead.x += 1;
-        if (snake.dir === 'left')  newHead.x -= 1;
-        if (snake.dir === 'up')    newHead.y -= 1;
-        if (snake.dir === 'down')  newHead.y += 1;
-
-        if (newHead.x < 0 || newHead.x >= COLS || newHead.y < 0 || newHead.y >= ROWS) {
-          gameOver = true; saveScoreIfGameOver('snake', score); haptic('error'); return;
-        }
-        for (var i = 0; i < snake.body.length; i++) {
-          if (snake.body[i].x === newHead.x && snake.body[i].y === newHead.y) {
-            gameOver = true; saveScoreIfGameOver('snake', score); haptic('error'); return;
-          }
-        }
-        snake.body.unshift(newHead);
-        if (newHead.x === snake.food.x && newHead.y === snake.food.y) {
-          updateScoreDisplay(score + 1); haptic('light'); generateSnakeFood();
-        } else {
-          snake.body.pop();
-        }
-      }
-
-      function stepFlappy(dt) {
-        if (flappyGameOver || isPaused) return;
-        flappyBird.vy += FLAPPY_GRAVITY * dt;
-        flappyBird.y  += flappyBird.vy * dt * 60;
-
-        if (flappyBird.y - flappyBird.radius < 0) { flappyBird.y = flappyBird.radius; flappyBird.vy = 0; }
-        if (flappyBird.y + flappyBird.radius > canvas.height) {
-          flappyGameOver = true; saveScoreIfGameOver('flappy', flappyScore); haptic('error'); return;
-        }
-
-        for (var i = 0; i < flappyPipes.length; i++) {
-          var pipe = flappyPipes[i];
-          pipe.x -= FLAPPY_PIPE_SPEED * dt * 60;
-          if (pipe.x + FLAPPY_PIPE_WIDTH < 0) { flappyPipes.splice(i, 1); i--; continue; }
-          if (150 + flappyBird.radius > pipe.x && 150 - flappyBird.radius < pipe.x + FLAPPY_PIPE_WIDTH) {
-            if (flappyBird.y - flappyBird.radius < pipe.top ||
-                flappyBird.y + flappyBird.radius > pipe.top + FLAPPY_PIPE_GAP) {
-              flappyGameOver = true; saveScoreIfGameOver('flappy', flappyScore); haptic('error'); return;
-            }
-          }
-          if (!pipe.passed && pipe.x + FLAPPY_PIPE_WIDTH < 150) {
-            pipe.passed = true; flappyScore++; updateScoreDisplay(flappyScore); haptic('light');
-          }
-        }
-
-        if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length-1].x < 600) {
-          flappyPipes.push({ x: 800, top: 50 + Math.random() * 200, passed: false });
-        }
-      }
-
-      function stepAstro(dt) {
-        if (astroGameOver || isPaused) return;
-
-        if (keys['ArrowLeft']  && astroPlayer.x > 10) astroPlayer.x -= ASTRO_SPEED;
-        if (keys['ArrowRight'] && astroPlayer.x < canvas.width - astroPlayer.width - 10) astroPlayer.x += ASTRO_SPEED;
-
-        astroSpawnTimer += dt;
-        if (astroSpawnTimer >= ASTRO_SPAWN_EVERY) {
-          astroSpawnTimer = 0;
-          astroObstacles.push({
-            x: Math.random() * (canvas.width - ASTRO_OBS_WIDTH),
-            y: -ASTRO_OBS_HEIGHT,
-            w: ASTRO_OBS_WIDTH, h: ASTRO_OBS_HEIGHT,
-          });
-        }
-
-        for (var i = astroObstacles.length - 1; i >= 0; i--) {
-          var obs = astroObstacles[i];
-          obs.y += ASTRO_FALL;
-          if (obs.x < astroPlayer.x + astroPlayer.width &&
-              obs.x + obs.w > astroPlayer.x &&
-              obs.y < astroPlayer.y + astroPlayer.height &&
-              obs.y + obs.h > astroPlayer.y) {
-            astroGameOver = true; saveScoreIfGameOver('astro', astroScore); haptic('error'); return;
-          }
-          if (obs.y > canvas.height) {
-            astroObstacles.splice(i, 1); astroScore++; updateScoreDisplay(astroScore); haptic('light');
-          }
-        }
-      }
-
-      function stepSapper() {
-        if (sapperGameOver || sapperWin || isPaused) return;
-        var revealedCount = 0, totalSafe = SAPPER_ROWS * SAPPER_COLS - SAPPER_MINES;
-        for (var r = 0; r < SAPPER_ROWS; r++) for (var c = 0; c < SAPPER_COLS; c++) {
-          if (sapperRevealed[r][c] && sapperGrid[r][c] !== -1) revealedCount++;
-        }
-        if (revealedCount === totalSafe && !sapperWin) {
-          sapperWin = true; saveScoreIfGameOver('sapper', score); haptic('success');
-        }
-      }
-
-      function mainLoop(timestamp) {
-        if (!lastFrameTime) lastFrameTime = timestamp;
-        var dt = (timestamp - lastFrameTime) / 1000;
-        lastFrameTime = timestamp;
-        if (dt > MAX_FRAME) dt = MAX_FRAME;
-
-        clearCanvas();
-        if (currentGame === 'snake') drawSnake();
-        else if (currentGame === 'sapper') drawSapper();
-        else if (currentGame === 'flappy') drawFlappy();
-        else if (currentGame === 'astro') drawAstro();
-        else if (currentGame === 'pudge') drawPudge();
-
-        if (!isPaused) {
-          logicAccumulator += dt;
-          while (logicAccumulator >= LOGIC_STEP) {
-            logicAccumulator -= LOGIC_STEP;
-
-            if (currentGame === 'snake') {
-              snakeTimer += LOGIC_STEP;
-              if (snakeTimer >= 1 / SNAKE_SPEED) {
-                snakeTimer = 0;
-                stepSnake();
-              }
-            } else if (currentGame === 'flappy') {
-              stepFlappy(LOGIC_STEP);
-            } else if (currentGame === 'astro') {
-              stepAstro(LOGIC_STEP);
-            } else if (currentGame === 'sapper') {
-              stepSapper();
-            } else if (currentGame === 'pudge') {
-              updatePudge(LOGIC_STEP);
-            }
-          }
-        }
-
-        animationFrame = requestAnimationFrame(mainLoop);
-      }
-
-      function startRenderLoop() {
-        if (animationFrame) cancelAnimationFrame(animationFrame);
-        lastFrameTime = 0;
-        logicAccumulator = 0;
-        animationFrame = requestAnimationFrame(mainLoop);
-      }
-
-      function handleBackButton() {
-        if (modal.classList.contains('active')) closeModalAndStop();
-      }
-
-      function closeModalAndStop() {
-        modal.classList.remove('active');
-        stopAllIntervals();
-        tgHideBack();
-      }
-
-      function switchGame(game) {
-        stopCurrentGame();
-        currentGame = game;
-        var titles = {
-          snake: 'ЗМЕЙКА',
-          sapper: 'САПЁР',
-          flappy: 'FLAPPY BIRD',
-          astro: 'КОСМО-ДОДЖ',
-          pudge: '🪝 PUDGE HOOK'
-        };
-        modalGameTitle.textContent = titles[game] || 'ИГРА';
-
-        if (game === 'snake') initSnake();
-        else if (game === 'sapper') initSapper();
-        else if (game === 'flappy') initFlappy();
-        else if (game === 'astro') initAstro();
-        else if (game === 'pudge') initPudge();
-
-        startRenderLoop();
-        isPaused = false;
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-        tgShowBack(handleBackButton);
-      }
-
-      window.addEventListener('keydown', function(e) {
-        keys[e.key] = true;
-        if (currentGame === 'snake') {
-          if (e.key === 'ArrowUp')    { e.preventDefault(); snake.nextDir = 'up';    haptic('select'); }
-          if (e.key === 'ArrowDown')  { e.preventDefault(); snake.nextDir = 'down';  haptic('select'); }
-          if (e.key === 'ArrowLeft')  { e.preventDefault(); snake.nextDir = 'left';  haptic('select'); }
-          if (e.key === 'ArrowRight') { e.preventDefault(); snake.nextDir = 'right'; haptic('select'); }
-        }
-        if (currentGame === 'flappy' && (e.key === ' ' || e.key === 'Space')) {
-          e.preventDefault();
-          if (!flappyGameOver && !isPaused) { flappyBird.vy = FLAPPY_JUMP; haptic('light'); }
-        }
-        if (e.key === 'r' || e.key === 'R' || e.key === 'к' || e.key === 'К') {
-          e.preventDefault(); restartCurrentGame();
-        }
-        if (e.key === 'Escape') closeModalAndStop();
-      });
-
-      window.addEventListener('keyup', function(e) { keys[e.key] = false; });
-
-      var longPressTimer = null;
-      var isLongPress = false;
-
-      canvas.addEventListener('click', function(e) {
-        if (currentGame === 'pudge') {
-          if (pudgeGameOver || isPaused) return;
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width;
-          var scaleY = canvas.height / rect.height;
-          var mx = (e.clientX - rect.left) * scaleX;
-          var my = (e.clientY - rect.top) * scaleY;
-          launchHook(mx, my);
-          return;
-        }
-
-        if (isLongPress) { isLongPress = false; return; }
-
-        if (currentGame === 'flappy') {
-          if (!flappyGameOver && !isPaused) { flappyBird.vy = FLAPPY_JUMP; haptic('light'); }
-        } else if (currentGame === 'sapper') {
-          if (sapperGameOver || sapperWin || isPaused) return;
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-          var mouseX = (e.clientX - rect.left) * scaleX, mouseY = (e.clientY - rect.top) * scaleY;
-          var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-          var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
-
-          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
-            if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
-            if (sapperGrid[r][c] === -1) {
-              sapperGameOver = true;
-              sapperRevealed[r][c] = true;
-              saveScoreIfGameOver('sapper', score);
-              haptic('error');
-            } else {
-              revealSapperCell(r, c);
-              updateScoreDisplay(score + 1);
-              haptic('light');
-              stepSapper();
-            }
-          }
-        } else if (currentGame === 'astro') {
-          var rect2 = canvas.getBoundingClientRect();
-          var tapX = e.clientX - rect2.left;
-          if (tapX < rect2.width / 2) astroPlayer.x = Math.max(10, astroPlayer.x - 40);
-          else astroPlayer.x = Math.min(canvas.width - astroPlayer.width - 10, astroPlayer.x + 40);
-          haptic('light');
-        }
-      });
-
-      canvas.addEventListener('touchstart', function(e) {
-        if (currentGame === 'pudge') {
-          if (pudgeGameOver || isPaused) return;
-          var touch = e.touches[0];
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width;
-          var scaleY = canvas.height / rect.height;
-          var mx = (touch.clientX - rect.left) * scaleX;
-          var my = (touch.clientY - rect.top) * scaleY;
-          launchHook(mx, my);
-          e.preventDefault();
-          return;
-        }
-
-        if (currentGame !== 'sapper') return;
-        if (sapperGameOver || sapperWin || isPaused) return;
-        var touch = e.touches[0];
-        var rect = canvas.getBoundingClientRect();
-        var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-        var mouseX = (touch.clientX - rect.left) * scaleX, mouseY = (touch.clientY - rect.top) * scaleY;
-        var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-        var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
-        isLongPress = false;
-        longPressTimer = setTimeout(function() {
-          isLongPress = true;
-          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
-            if (sapperRevealed[r][c]) return;
-            sapperFlags[r][c] = !sapperFlags[r][c];
-            haptic('medium');
-          }
-        }, 400);
-      }, { passive: false });
-
-      canvas.addEventListener('touchend', function() {
-        if (longPressTimer) clearTimeout(longPressTimer);
-      });
-
-      canvas.addEventListener('contextmenu', function(e) {
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+    <div class="ticker__inner">
+        <span>
+            ДРОВЯНАЯ ПЕЧЬ <span class="dot"></span>
+            <span class="outline">48 ЧАСОВ ВЫДЕРЖКИ</span> <span class="dot"></span>
+            МУКА TIPO 00 <span class="dot"></span>
+            <span class="outline">НЕАПОЛИТАНСКИЙ СТИЛЬ</span> <span class="dot"></span>
+            МОЦАРЕЛЛА ДИ БУФАЛА <span class="dot"></span>
+        </span>
+        <span>
+            ДРОВЯНАЯ ПЕЧЬ <span class="dot"></span>
+            <span class="outline">48 ЧАСОВ ВЫДЕРЖКИ</span> <span class="dot"></span>
+            МУКА TIPO 00 <span class="dot"></span>
+            <span class="outline">НЕАПОЛИТАНСКИЙ СТИЛЬ</span> <span class="dot"></span>
+            МОЦАРЕЛЛА ДИ БУФАЛА <span class="dot"></span>
+        </span>
+    </div>
+</div>
+
+<!-- MENU -->
+<section class="section" id="menu">
+    <div class="container">
+        <div class="section__head">
+            <div class="section__num">01</div>
+            <h2 class="section__title">Меню / Six pizzas</h2>
+            <div class="section__sub">6 из 16 / обновлено 01.10.26</div>
+        </div>
+
+        <div class="menu-grid" id="menuGrid"></div>
+    </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy" id="philosophy">
+    <div class="container">
+        <div class="philosophy__left">
+            <div class="philosophy__label">ФИЛОСОФИЯ</div>
+            <h2 class="philosophy__title">
+                Тесто<br>
+                как <em>форма</em><br>
+                искусства
+            </h2>
+            <div class="philosophy__quote">
+                «Хорошая пицца не терпит спешки. Она требует тишины,
+                точности и уважения к муке».
+                <br><br>
+                — Тимофей Егоров, шеф-пиццайоло
+            </div>
+        </div>
+
+        <div class="philosophy__right">
+            <p class="philosophy__text">
+                Мы работаем с <b>тремя видами муки</b> — Tipo 00 из Неаполя,
+                цельнозерновая из Прованса и полбяная из Тосканы. Тесто
+                вызревает <em>48 часов</em> при 4 °C, потом ещё 6 часов при
+                комнатной температуре. Именно поэтому у нашей пиццы —
+                <b>лёгкая, воздушная корочка</b> и характер, который ни с чем
+                не спутать.
+            </p>
+            <p class="philosophy__text">
+                Соус — только из <em>томатов Сан-Марцано</em>, собранных вручную
+                в Кампании. Никаких концентратов, никакого сахара. Сыр — моцарелла
+                ди буфала DOP, привозим дважды в неделю.
+            </p>
+
+            <div class="principles">
+                <div class="principle">
+                    <div class="principle__num">01</div>
+                    <div class="principle__title">Меньше — значит больше</div>
+                    <p class="principle__desc">В меню 16 пицц. Мы не гонимся за количеством, каждая рецептура отработана годами.</p>
+                </div>
+                <div class="principle">
+                    <div class="principle__num">02</div>
+                    <div class="principle__title">Сезонность</div>
+                    <p class="principle__desc">Меню меняется четыре раза в год. Летом — томаты, зимой — трюфель и тыква.</p>
+                </div>
+                <div class="principle">
+                    <div class="principle__num">03</div>
+                    <div class="principle__title">Прямая печь</div>
+                    <p class="principle__desc">Дрова, 480 °C, 90 секунд. Так пицца готовится в Неаполе 200 лет.</p>
+                </div>
+                <div class="principle">
+                    <div class="principle__num">04</div>
+                    <div class="principle__title">Прозрачность</div>
+                    <p class="principle__desc">Открытая кухня. Любой гость может увидеть, как работает пиццайоло.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BOOKING -->
+<section class="booking" id="booking">
+    <div class="container">
+        <div class="section__head">
+            <div class="section__num">02</div>
+            <h2 class="section__title">Бронирование</h2>
+            <div class="section__sub">стол на вечер / 2 часа</div>
+        </div>
+
+        <div class="booking__grid">
+            <div class="booking__info">
+                <h2>
+                    Займите<br>
+                    свой <em>стол</em>
+                </h2>
+                <p>
+                    Мы принимаем бронирования <b>за 24 часа</b>. Стол держим
+                    15 минут. Если задерживаетесь — позвоните, мы всё решим.
+                </p>
+
+                <div class="contacts">
+                    <div class="contact-row">
+                        <div class="contact-row__label">Адрес</div>
+                        <div class="contact-row__value">МОСКВА, БУЛЬВАР<br>ГЕНЕРАЛА КАРБЫШЕВА, ДОМ 2</div>
+                    </div>
+                    <div class="contact-row">
+                        <div class="contact-row__label">Телефон</div>
+                        <div class="contact-row__value">
+                            <a href="tel:+74951234567">+7 495 123-45-67</a>
+                        </div>
+                    </div>
+                    <div class="contact-row">
+                        <div class="contact-row__label">Email</div>
+                        <div class="contact-row__value">
+                            <a href="mailto:timoshenkoolga@gmail.com">timoshenkoolga@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-row">
+                        <div class="contact-row__label">Часы</div>
+                        <div class="contact-row__value">12:00 — 23:00 / пн–вс</div>
+                    </div>
+                </div>
+
+                <div class="hours" id="hoursGrid"></div>
+            </div>
+
+            <form class="booking__form" id="bookingForm">
+                <div class="field">
+                    <label class="field__label" for="name">Имя</label>
+                    <input type="text" id="name" placeholder="Как к вам обращаться" required>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="phone">Телефон</label>
+                    <input type="tel" id="phone" placeholder="+7 ___ ___-__-__" required>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field__label" for="date">Дата</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="time">Время</label>
+                        <input type="time" id="time" value="19:00" required>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field__label" for="guests">Гостей</label>
+                        <select id="guests" required>
+                            <option value="">—</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6+</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="zone">Зона</label>
+                        <select id="zone" required>
+                            <option value="">—</option>
+                            <option>У печи</option>
+                            <option>У окна</option>
+                            <option>Бар</option>
+                            <option>Веранда</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="field__label" for="wishes">Пожелания</label>
+                    <textarea id="wishes" rows="3" placeholder="аллергии, повод, особые просьбы..."></textarea>
+                </div>
+
+                <button type="submit" class="btn">Забронировать →</button>
+                <div class="booking__note">Подтверждение придёт SMS в течение 15 минут</div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="contacts">
+    <div class="container">
+        <div class="footer__brand">
+            <span>TIMO</span>
+            <span class="outline">EGO</span>
+            <span class="accent">ROV</span>
+        </div>
+
+        <div class="footer__bottom">
+            <div class="footer__col">
+                <h4>Пиццерия</h4>
+                <a href="#menu">Меню</a>
+                <a href="#philosophy">Философия</a>
+                <a href="#booking">Бронирование</a>
+                <a href="#">Доставка</a>
+            </div>
+            <div class="footer__col">
+                <h4>Контакты</h4>
+                <a href="tel:+74951234567">+7 495 123-45-67</a>
+                <a href="mailto:timoshenkoolga@gmail.com">timoshenkoolga@gmail.com</a>
+                <a href="#">Telegram</a>
+                <a href="#">Instagram</a>
+            </div>
+            <div class="footer__col">
+                <h4>Адрес</h4>
+                <p>Москва, Бульвар<br>Генерала Карбышева, дом 2</p>
+                <p style="margin-top: 12px;">Пн–Вс: 12:00 — 23:00</p>
+            </div>
+        </div>
+
+        <div class="footer__legal">
+            <span>© 2026 TIMOEGOROV PIZZERIA</span>
+            <span>MADE WITH FIRE &amp; DOUGH</span>
+            <span>MMXXVI</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+/* ============================================================
+   МЕНЮ
+   ============================================================ */
+const PIZZAS = [
+    { num: '01', art: '⌘', name: 'Timo', latin: 'Timo Originale',
+      ingredients: ['Томаты Сан-Марцано', 'Моцарелла ди буфала', 'Базилик', 'Оливковое масло'],
+      price: 1290, heat: 0, tag: 'SIGNATURE' },
+    { num: '02', art: '✕', name: 'Marzano', latin: 'Pomodoro Crudo',
+      ingredients: ['Томаты черри', 'Страчателла', 'Руккола', 'Бальзамик'],
+      price: 1490, heat: 1, tag: 'FRESH' },
+    { num: '03', art: '◊', name: 'Nero', latin: 'Tartufo Nero',
+      ingredients: ['Крем из чёрного трюфеля', 'Моцарелла фиор ди латте', 'Шампиньоны', 'Тимьян'],
+      price: 2190, heat: 0, tag: 'PREMIUM' },
+    { num: '04', art: '✦', name: 'Piccante', latin: 'Diavola Piccante',
+      ingredients: ['Острая салями', 'Ндуйя', 'Перец чили', 'Мёд'],
+      price: 1590, heat: 4, tag: 'HOT' },
+    { num: '05', art: '◐', name: 'Bianca', latin: 'Quattro Formaggi',
+      ingredients: ['Горгонзола', 'Пармезан', 'Фонтина', 'Моцарелла'],
+      price: 1690, heat: 0, tag: 'CHEESE' },
+    { num: '06', art: '△', name: 'Verde', latin: 'Ortolana Verde',
+      ingredients: ['Кабачок', 'Баклажан', 'Перец', 'Песто из базилика'],
+      price: 1390, heat: 1, tag: 'VEG' }
+];
+
+function renderMenu() {
+    const grid = document.getElementById('menuGrid');
+    grid.innerHTML = PIZZAS.map(p => {
+        const heatBars = Array.from({ length: 5 }, (_, i) =>
+            `<div class="bar ${i < p.heat ? 'on' : ''}"></div>`
+        ).join('');
+        return `
+            <article class="pizza" data-num="${p.num}">
+                <div class="pizza__top">
+                    <span class="pizza__num">${p.num}</span>
+                    <span class="pizza__tag">${p.tag}</span>
+                </div>
+                <div class="pizza__art">${p.art}</div>
+                <h3 class="pizza__name">${p.name}</h3>
+                <div class="pizza__latin">${p.latin}</div>
+                <div class="pizza__ingredients">
+                    ${p.ingredients.map(i => `<b>${i}</b>`).join(' · ')}
+                </div>
+                <div class="pizza__bottom">
+                    <div class="pizza__price">${p.price}<small>₽</small></div>
+                    <div class="pizza__heat">${heatBars}</div>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+renderMenu();
+
+/* ============================================================
+   ЧАСЫ
+   ============================================================ */
+const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+function renderHours() {
+    const grid = document.getElementById('hoursGrid');
+    const today = (new Date().getDay() + 6) % 7;
+    grid.innerHTML = DAYS.map((d, i) => `
+        <div class="hours__day ${i === today ? 'today' : ''}">
+            <div class="hours__name">${d}</div>
+            <div class="hours__time">12–23</div>
+        </div>
+    `).join('');
+}
+renderHours();
+
+/* ============================================================
+   ФОРМА → показать экран @OWTimoshenko (без редиректа)
+   ============================================================ */
+(function form() {
+    const form = document.getElementById('bookingForm');
+    const dateInput = document.getElementById('date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+    dateInput.min = today;
+
+    form.addEventListener('submit', e => {
         e.preventDefault();
-        if (currentGame === 'sapper') {
-          if (sapperGameOver || sapperWin || isPaused) return;
-          var rect = canvas.getBoundingClientRect();
-          var scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-          var mouseX = (e.clientX - rect.left) * scaleX, mouseY = (e.clientY - rect.top) * scaleY;
-          var cellW = canvas.width / SAPPER_COLS, cellH = canvas.height / SAPPER_ROWS;
-          var c = Math.floor(mouseX / cellW), r = Math.floor(mouseY / cellH);
-          if (r >= 0 && r < SAPPER_ROWS && c >= 0 && c < SAPPER_COLS) {
-            if (sapperRevealed[r][c]) return;
-            sapperFlags[r][c] = !sapperFlags[r][c];
-            haptic('medium');
-          }
+
+        const name = form.querySelector('#name').value.trim();
+        const phone = form.querySelector('#phone').value.trim();
+
+        if (!name || !phone) {
+            alert('Заполните имя и телефон');
+            return;
         }
-      });
 
-      function revealSapperCell(r, c) {
-        if (r < 0 || r >= SAPPER_ROWS || c < 0 || c >= SAPPER_COLS) return;
-        if (sapperRevealed[r][c] || sapperFlags[r][c]) return;
-        if (sapperGrid[r][c] === -1) {
-          sapperGameOver = true;
-          sapperRevealed[r][c] = true;
-          return;
+        const btn = form.querySelector('.btn');
+        btn.textContent = 'Отправка...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            // Переключаем на экран @OWTimoshenko
+            document.getElementById('owScreen').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            window.scrollTo(0, 0);
+        }, 600);
+    });
+})();
+
+/* ============================================================
+   КНОПКА «НАЗАД» на экране @OWTimoshenko
+   ============================================================ */
+document.getElementById('owBack').addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('owScreen').classList.remove('active');
+    document.body.style.overflow = '';
+
+    // Возврат к форме бронирования
+    document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+
+    // Возвращаем кнопку в исходное состояние
+    const btn = document.querySelector('#bookingForm .btn');
+    btn.textContent = 'Забронировать →';
+    btn.disabled = false;
+});
+
+/* ============================================================
+   МАСКА ТЕЛЕФОНА
+   ============================================================ */
+(function phoneMask() {
+    const input = document.getElementById('phone');
+    if (!input) return;
+    input.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.startsWith('8')) v = '7' + v.slice(1);
+        if (!v.startsWith('7')) v = '7' + v;
+
+        let out = '+7';
+        if (v.length > 1) out += ' (' + v.slice(1, 4);
+        if (v.length >= 5) out += ') ' + v.slice(4, 7);
+        if (v.length >= 8) out += '-' + v.slice(7, 9);
+        if (v.length >= 10) out += '-' + v.slice(9, 11);
+        e.target.value = out;
+    });
+})();
+
+/* ============================================================
+   ПЛАВНЫЙ СКРОЛЛ
+   ============================================================ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        const id = a.getAttribute('href');
+        if (id === '#' || id.length < 2) return;
+        const target = document.querySelector(id);
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        sapperRevealed[r][c] = true;
-        if (sapperGrid[r][c] === 0) {
-          for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            revealSapperCell(r + dr, c + dc);
-          }
-        }
-      }
+    });
+});
+</script>
 
-      document.getElementById('restartBtn').addEventListener('click', function() {
-        haptic('medium'); restartCurrentGame();
-      });
-
-      document.getElementById('pauseBtn').addEventListener('click', function() {
-        if (gameOver && currentGame !== 'sapper') return;
-        if (currentGame === 'sapper' && (sapperGameOver || sapperWin)) return;
-        if (currentGame === 'pudge' && pudgeGameOver) return;
-        isPaused = !isPaused;
-        this.textContent = isPaused ? '▶ Продолжить' : '⏸ Пауза';
-        haptic('light');
-      });
-
-      function restartCurrentGame() {
-        if (currentGame === 'snake') initSnake();
-        else if (currentGame === 'sapper') initSapper();
-        else if (currentGame === 'flappy') initFlappy();
-        else if (currentGame === 'astro') initAstro();
-        else if (currentGame === 'pudge') initPudge();
-        isPaused = false; gameOver = false;
-        document.getElementById('pauseBtn').textContent = '⏸ Пауза';
-      }
-
-      var cards = document.querySelectorAll('.game-card');
-      for (var i = 0; i < cards.length; i++) {
-        cards[i].addEventListener('click', function() {
-          haptic('medium');
-          modal.classList.add('active');
-          switchGame(this.getAttribute('data-game'));
-        });
-      }
-
-      document.getElementById('closeModal').addEventListener('click', function() {
-        haptic('light'); closeModalAndStop();
-      });
-
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) { haptic('light'); closeModalAndStop(); }
-      });
-    })();
-  </script>
 </body>
 </html>
